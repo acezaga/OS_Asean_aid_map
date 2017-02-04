@@ -12,11 +12,13 @@ require('../models/Summary');
 require('../models/Performance');
 require('../models/FAQ');
 
-var url = 'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
-  process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
-  process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-  process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
-  process.env.OPENSHIFT_APP_NAME;
+// var url = 'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+//   process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+//   process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+//   process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+//   process.env.OPENSHIFT_APP_NAME;
+
+var url = process.env.OPENSHIFT_MONGODB_DB_URL + 'sampledb';
 
 // if (process.env.OPENSHIFT_MONGODB_DB_URL) {
     // url = process.env.OPENSHIFT_MONGODB_DB_URL +
