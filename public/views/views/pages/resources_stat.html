@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Resource Statistics</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <span class="help-block">This report compares the number of needed and donated resources of the projects initiated by the organization.</span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label>Year</label>
+            <select ng-model="year" ng-change="filterProjects()" class="form-control">
+                <option>2017</option>
+                <option>2018</option>
+                <option>2019</option>
+                <option>2020</option>
+                <option>2021</option>
+                <option>2022</option>
+                <option>2023</option>
+                <option>2024</option>
+                <option>2025</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label>Project</label>
+            <select ng-model="selectedProject" ng-options="project.title for project in projects" ng-change="getResourceStat()" class="form-control">
+                <!--<option>Project Name</option>-->
+            </select>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12" id="bar-chart">
+        <div class="panel panel-default">
+            <!--<div class="panel-heading">Bar Chart</div>-->
+            <div class="panel-body">
+                <canvas id="base" class="chart-horizontal-bar" chart-data="data" chart-labels="chartLabel" chart-colours="colours" chart-series="chartSeries"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

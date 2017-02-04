@@ -1,0 +1,186 @@
+<div ng-init="checkOwnership()">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Organization Profile</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <toaster-container></toaster-container>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <i class="fa fa-vcard-o fa-fw"></i> {{selectedAccount.orgname}}
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="col-lg-3">
+                        <div class="org-profile-avatar">
+                            <img class="img-circle" data-ng-src="{{ selectedAccount.picture ? 'data:image/png;base64,'+selectedAccount.picture :  'images/def-org.jpg'}}" data-err-src="images/def-org.jpg" alt="avatar" />
+                            <br/>
+                            <br/>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-default btn-xs" ng-if="owner && authentication" ui-sref="dashboard.editprofile"><i class="fa fa-pencil"></i>&nbsp;Edit Profile</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-if="!owner && !connected && !requested && !pendingReq && authentication" ng-click="addConnection()"><i class="fa fa-user-plus"></i>&nbsp;Add Connection</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-if="!owner && !connected && requested && !pendingReq && authentication" ng-click="cancelConnectionRequest()"><i class="fa fa-minus-circle "></i>&nbsp;Cancel Connection Request</button>
+                                <button type="button" class="btn btn-default btn-xs" ng-if="!owner && connected && !pendingReq && authentication" ng-click="removeConn()"><i class="fa fa-user-times"></i>&nbsp;Remove Connection</button>
+                                <button type="button" class="btn btn-default btn-xs" disabled ng-if="!owner && !connected && !requested && pendingReq && authentication"><i class="fa fa-user-plus"></i>&nbsp;Pending Connection Request. <br/>Check notification.</button>
+                            </div>
+                        </div>
+                    </div>
+                    &nbsp;
+                    <div class="col-lg-9">
+                        <div class="org_det well">
+                            <label><i class="fa fa-institution fa-fw"></i>&nbsp;Sectors: </label><span class="org_sector"> sectors </span><br/>
+                            <label><i class="fa fa-building fa-fw"></i>&nbsp;Address: </label><span class="org_address"> {{selectedAccount.address}}, {{selectedAccount.country}}</span> <br/>
+                            <label><i class="fa fa-phone fa-fw"></i>&nbsp;Phone: </label><span class="org_phone"> {{selectedAccount.contacts.telNo}} </span> <br/>
+                            <label><i class="fa fa-envelope fa-fw"></i>&nbsp;Email: </label><span class="org_email"> {{selectedAccount.contacts.email}} </span> <br/>
+                            <label><i class="fa fa-desktop fa-fw"></i>&nbsp;Website: </label><span class="org_website"> {{selectedAccount.contacts.website}} </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2">
+            <ul class="nav nav-stacked">
+                <li ng-class="{ active: isSet(1) }">
+                    <a ng-click="setTab(1)">Description</a>
+                </li>
+                <li ng-class="{ active: isSet(2) }">
+                    <a ng-click="setTab(2)">Ongoing ({{ongoingProjects.length}})</a>
+                </li>
+                <li ng-class="{ active: isSet(3) }">
+                    <a ng-click="setTab(3)">Portfolio ({{portfolio.length}})</a>
+                </li>
+                <li ng-class="{ active: isSet(4) }">
+                    <a ng-click="setTab(4)">Connections ({{selectedAccount.connections.length}})</a>
+                </li>
+                <li ng-class="{ active: isSet(5) }">
+                    <a ng-click="setTab(5)">Awards and Certifications ({{selectedAccount.awards.length}})</a>
+                </li>
+                <li ng-class="{ active: isSet(6) }">
+                    <a ng-click="setTab(6)">Resources</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-10">
+            <div class="content well">
+                <div ng-if="isSet(1)">
+                    <div class="empty-tab text-center" ng-if="!selectedAccount.description">
+                        No description to show
+                    </div>
+                    <p> {{selectedAccount.description}} </p>
+                    <p><label>Mission:</label><br/>
+                        {{selectedAccount.mission}} <br/>
+                        <label>Vision:</label>
+                        {{selectedAccount.vision}}
+                    </p>
+                </div>
+                <div ng-if="isSet(2)">
+                    <!--<p ng-repeat="project in ongoingProjects">{{project.title}}</p>-->
+                    <div class="row">
+                        <div class="empty-tab text-center" ng-if="ongoingProjects.length < 1">
+                            No ongoing projects
+                        </div>
+                        <div class="col-lg-4" ng-repeat="project in ongoingProjects">
+                            <div class="panel panel-green" id="ongoing" >
+                                <div class="panel-body">
+                                    <div class="ongoingproj">
+                                        <div class="col-sm-3">
+                                            <i class="fa fa-archive fa-3x"></i>
+                                        </div>
+                                        <div class="col-sm-9" ng-click="onClickProjectName(project)">
+                                            {{project.title}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="isSet(3)">
+                    <!--<p ng-repeat="project in portfolio">{{project.title}}</p>-->
+                    <div class="row">
+                        <div class="empty-tab text-center" ng-if="portfolio.length < 1">
+                            No projects in portfolio
+                        </div>
+                        <div class="col-lg-4" ng-repeat="project in portfolio">
+                            <div class="panel panel-info" id="portfolio">
+                                <div class="panel-body">
+                                    <div class="ongoingproj">
+                                        <div class="col-sm-3">
+                                            <i class="fa fa-archive fa-3x"></i>
+                                        </div>
+                                        <div class="col-sm-9" ng-click="onClickProjectName(project)">
+                                            {{project.title}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="isSet(4)" ng-init="getConnecionsInfo()">
+                    <!--<span ng-repeat="conn in selectedAccount.connections">{{conn.orgname}},&nbsp;</span>-->
+                    <div class="row">
+                        <div class="empty-tab text-center" ng-if="selectedAccount.connections.length < 1">
+                            No connections
+                        </div>
+                        <div class="col-lg-4" ng-repeat="conn in selectedAccount.connections">
+                            <div class="panel panel-default" id="connections">
+                                <div class="panel-body">
+                                    <div class="ongoingproj">
+                                        <div class="col-sm-3">
+                                            <i class="fa fa-vcard-o fa-3x"></i>
+                                        </div>
+                                        <div class="col-sm-9" ng-click="onClickOrgName(conn)">
+                                            {{conn.orgname}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="isSet(5)">
+                    <div class="row">
+                        <div class="empty-tab text-center" ng-if="selectedAccount.awards.length < 1">
+                            No awards/certifications to show
+                        </div>
+                        <div class="col-lg-4" ng-repeat="awards in selectedAccount.awards">
+                            <div class="panel panel-warning" id="awards" >
+                                <div class="panel-body">
+                                    <div class="ongoingproj">
+                                        <div class="col-sm-3">
+                                            <i class="fa fa-trophy fa-3x"></i>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            {{awards}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="isSet(6)">
+                    <p>Available Resources:</p>
+                    <div class="row">
+                        <div ng-repeat="resource in selectedAccount.resources track by $index">
+                            <ostats resname="{{resource.type}}" colour="primary" type="getResourceIcon(resource.type)" resdetails="{{resource.description}}" dynamicresource="{{resource.quantity}}"></ostats>
+                        </div>
+                        <!--<stats resname="Food Supply" colour="primary" type="shopping-cart" resdetails="Resource details here."></stats>-->
+                        <!--<stats resname="Food Supply" colour="primary" type="shopping-cart" resdetails=""></stats>-->
+                        <!--<stats resname="Food Supply" colour="primary" type="shopping-cart" resdetails="Resource details here."></stats>-->
+                        <!--<stats resname="Food Supply" colour="primary" type="shopping-cart" resdetails="Resource details here."></stats>-->
+                        <!--<stats resname="Food Supply" colour="primary" type="shopping-cart" resdetails="Resource details here."></stats>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.row -->
+

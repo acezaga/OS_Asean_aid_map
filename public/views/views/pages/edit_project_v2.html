@@ -1,0 +1,270 @@
+<div class="row">
+    <div class="col-lg-12" ng-if="thisIsCreateProject">
+        <h1 class="page-header">Create Project</h1>
+    </div>
+    <div class="col-lg-12" ng-if="!thisIsCreateProject">
+        <h1 class="page-header">Edit Project</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<toaster-container></toaster-container>
+<!-- /.row -->
+<div class="row">
+    <form role="form" novalidate ng-submit="submit()">
+        <div class="col-lg-12">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p class="required-block">* Required Fields</p>
+                        <!--<br/>-->
+                        <legend>Project Information&nbsp;<span class="legend-block">(What is the project about?)</span></legend>
+                        <div class="form-group">
+                            <label><span class="required-label">*</span>Project Title:</label>
+                            <input type="text" class="form-control" ng-maxlength="50" ng-model="project.title" placeholder="Project Title" ng-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label>Project Description:</label>
+                            <textarea class="form-control" rows="3" ng-model="project.description" placeholder="What is this project about?" required></textarea>
+                        </div>
+                        <label><span class="required-label">*</span>Sector:</label>
+                        <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('sector')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        <div class="form-group" ng-repeat="sec in sectorSet.sectors track by $index">
+                            <select class="form-control input-group" ng-model="sec.type" ng-options="sector for sector in sectorTypes" required>
+                                <option value hidden>Select a Sector</option>
+                            </select>
+                            <br/>
+                            <div class="form-group">
+                                <p class="col-lg-2">Sub-sector:</p>
+                                <div class="col-lg-4">
+                                    <select class="form-control input-group" ng-disabled="!sec.type" ng-model="sec.subsector" ng-options="subsector for subsector in getSubSector(sec.type)">
+                                        <option value hidden>Select a Sub-sector</option>
+                                    </select>
+                                </div>
+                                <span class="input-group-btn">
+                                    <button ng-click="removeField($index, 'sector')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <br/>
+                        </div>
+                        <br/>
+                        <!--<hr>-->
+                        <legend>Project Address&nbsp;<span class="legend-block">(Where will the project be initiated?)</span></legend>
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label><span class="required-label">*</span>Country:</label>
+                                <div>
+                                    <select id="country" class="form-control" ng-model="project.address.country" ng-options="country for country in countries" required>
+                                        <option>Select a Country</option>
+                                        <!--<option>Brunei Darussalam</option>-->
+                                        <!--<option>Cambodia</option>-->
+                                        <!--<option>Indonesia</option>-->
+                                        <!--<option>Lao PDR</option>-->
+                                        <!--<option>Malaysia</option>-->
+                                        <!--<option>Myanmar</option>-->
+                                        <!--<option>Philippines</option>-->
+                                        <!--<option>Singapore</option>-->
+                                        <!--<option>Thailand</option>-->
+                                        <!--<option>Vietnam</option>-->
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>City/State: </label>
+                                <div class="col-lg-6">
+                                    <select id="city" ng-disabled="!project.address.country" class="form-control" ng-model="project.address.city" ng-options="city for city in GetSelectedCountry(project.address.country)" required>
+                                        <option value="">Select a City</option>
+                                        <!--<option ng-repeat="city in project.address.country" value="{{city}}">{{city}}</option>-->
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2">Street: </label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" ng-maxlength="20" ng-model="project.address.street" placeholder="Street">
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <!--<br/>-->
+                        <!--<hr>-->
+                        <legend>Project Timeline&nbsp;<span class="legend-block">(When will it start and possibly end?)</span></legend>
+                        <div class="form-group">
+                            <label class="col-lg-3"><span class="required-label">*</span>Start Date: </label>
+                            <div class="col-lg-3">
+                                <input type="text" ng-disabled="!thisIsCreateProject" class="form-control" uib-datepicker-popup="{{dateFormat}}" ng-click="openDatePicker(1)" ng-model="project.startDate" is-open="datepickerPopup1.opened" datepicker-options="dateOptions1" ng-required="true" close-text="Close" />
+                                <!--<input type="date" ng-model="project.startDate" class="form-control" ng-disabled="!thisIsCreateProject" />-->
+                            </div>
+                            <label class="col-lg-3"><span class="required-label">*</span>End Date: </label>
+                            <div class="col-lg-3">
+                                <input type="text" class="form-control" uib-datepicker-popup="{{dateFormat}}" ng-click="openDatePicker(2)" ng-model="project.endDate" is-open="datepickerPopup2.opened" datepicker-options="dateOptions2" close-text="Close" />
+                                <!--<input type="date" class="form-control" ng-model="project.endDate" />-->
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div ng-if="!thisIsCreateProject">
+                            <div class="form-group">
+                                <label class="col-lg-3"><span class="required-label">*</span>Status:</label>
+                                <div class="col-lg-4">
+                                    <select class="form-control" ng-model="project.status" required>
+                                        <option>Ongoing</option>
+                                        <option>On-hold</option>
+                                        <option>Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                        </div>
+                        <br/>
+                        <br/>
+                        <legend>Budget & Resources&nbsp;<span class="legend-block">(What are the needed materials for this project?)</span></legend>
+                        <div class="form-group">
+                            <label>Initial Budget:</label> <br/>
+                            <div class="col-lg-5">
+                                <input type="number" class="form-control" cols="5" ng-model="project.budget.amount" placeholder="Enter amount">
+                                <!--<div><input type="checkbox" ng-model="project.budget.shown">&nbsp;Show</div>-->
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <label><span class="required-label">*</span>Needed Resources:</label>
+                        <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('resource')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        <div class="row">
+                            <div class="form-group" ng-repeat="res in resourceSet.resource track by $index">
+                                <div class="col-lg-12">
+                                    <select class="form-control input-group" name="sector" ng-model="res.type" ng-options="resource for resource in resourcesTypes" required>
+                                        <span class="input-group-addon"><a href="#">+</a></span>
+                                        <option value hidden>Select a Resource</option>
+                                    </select>
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <div ng-if="activateField(res.type, 'DescQty')">
+                                    <div ng-if="activateField(res.type, 'Desc')">
+                                        <div class="col-lg-7">
+                                            <!--<input type="text" class="form-control" ng-model="res.description" placeholder="description">-->
+                                            <select class="form-control" name="sector" ng-model="res.description" ng-options="description for description in getDescriptionRes(res.type)" required></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="number" class="form-control" ng-model="res.qty" placeholder="Qty" required>
+                                    </div>
+                                        <span class="input-group-btn">
+                                            <button ng-click="removeField($index,'resource')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>
+                                            </button>
+                                        </span>
+                                </div>
+                                <!-- <hr>-->
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label><span class="required-label">*</span>Collaborator(s):</label>
+                            <input class="form-control" ng-model="project.Collaborator" placeholder="Add collaborators">
+                        </div>-->
+                        <legend>Contact&nbsp;<span class="legend-block">(How to contact the organization?)</span></legend>
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Email</label>
+                                <div class="col-lg-6">
+                                    <input type="email" class="form-control" ng-model="project.contacts.email" placeholder="email@email.com" required>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Tel No.</label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" ng-model="project.contacts.telNo" placeholder="Tel. No" required>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Website</label>
+                                <div class="col-lg-6">
+                                    <input type="url" class="form-control" ng-model="project.contacts.website" placeholder="http://" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <p></p>
+                        <div class="row">
+                            <form role="form">
+                                <br/>
+                                <legend>Project Photo&nbsp;<!--<span class="legend-block">(How to contact the organization?)</span>--></legend>
+                                <div class="form-group">
+                                    <input type="file" ng-model="projectPicture" base-sixty-four-input accept="image/*">
+                                    <label>Upload Project Profile Picture</label>
+                                    <span class="help-block">Ex. Project banner/logo.</span>
+                                </div>
+                            </form>
+                            <div class="projpp">
+                                <!--<img src="images/img/silent_underdogs.png">-->
+                                <img class="img-circle" data-ng-src="data:image/png;base64,{{project.picture}}" alt="avatar" />
+                            </div>
+                        </div>
+                        <br/>
+                        <legend>Media&nbsp;<span class="legend-block">(Photos/Video links of project site, event, etc.)</span></legend>
+                        <div class="form-group">
+                            <label>Add pictures:</label>
+                            <input type="file" ng-model="mediaPictures" base-sixty-four-input accept="image/*" multiple>
+                            <div class="row">
+                                <div class="projpp col-lg-3" ng-repeat="media in project.media track by $index">
+                                    <img data-ng-src="data:image/png;base64,{{media}}">
+                                </div>
+                                <!--<div class="projpp col-lg-3">-->
+                                <!--<img src="images/img/saya.png">-->
+                                <!--</div>-->
+                                <!--<div class="projpp col-lg-3">-->
+                                <!--<img src="images/img/saya.png">-->
+                                <!--</div>-->
+                                <!--<div class="projpp col-lg-3">-->
+                                <!--<img src="images/img/saya.png">-->
+                                <!--</div>-->
+                            </div>
+                            <!--<div class="form-group col-lg-5">
+                                <label>Add video link:</label>
+                                <div>
+                                    <input class="form-control" type="url">
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                    <!-- /.col-lg-6 (nested) -->
+
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-6"></div>
+                    <button class="btn btn-primary">&nbsp;&nbsp; Cancel &nbsp; &nbsp;</button>
+                    <button ng-click="saveChanges()" class="btn btn-primary">Save Changes</button>
+                </div>
+
+                <!-- /.row (nested) -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </form>
+    <!-- /.col-lg-12 -->
+</div>

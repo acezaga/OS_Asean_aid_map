@@ -1,0 +1,106 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Account Settings</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<toaster-container></toaster-container>
+
+<!-- /.row -->
+<div class="row">
+    <form role="form" novalidate ng-submit="submit()">
+        <div class="col-lg-12">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p class="required-block">* Required</p>
+                        <!--<div class="form-group">-->
+                            <!--<label>&lt;!&ndash;<span class="required-label">*</span>&ndash;&gt;Organization Name:</label>-->
+                            <!--<input type="text" class="form-control" placeholder="Organization Name" ng-required="true">-->
+                        <!--</div>-->
+                        <!--<div class="form-group">-->
+                            <!--<label>Country:</label>-->
+                            <!--<select class="form-control" ng-model="newUser.country">-->
+                                <!--<option>Brunei Darussalam</option>-->
+                                <!--<option>Cambodia</option>-->
+                                <!--<option>Indonesia</option>-->
+                                <!--<option>Lao PDR</option>-->
+                                <!--<option>Malaysia</option>-->
+                                <!--<option>Myanmar</option>-->
+                                <!--<option>Philippines</option>-->
+                                <!--<option>Singapore</option>-->
+                                <!--<option>Thailand</option>-->
+                                <!--<option>Vietnam</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                        <div class="form-group">
+                            <label><!--<span class="required-label">*</span>-->Email:</label>
+                            <input type="email" ng-model="accountSettings.email" class="form-control" placeholder="Email" ng-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label><!--<span class="required-label">*</span>-->Username:</label>
+                            <input type="text" ng-model="accountSettings.username" class="form-control" placeholder="Username" ng-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label><!--<span class="required-label">*</span>-->Old Password:</label>
+                            <input type="password" ng-model="accountSettings.oldPassword" class="form-control" placeholder="Old Password" ng-required="true">
+                            <p class="change-pass"><button class="btn btn-link" data-toggle="modal" data-target="#changePass">Change Password</button></p>
+                        </div>
+                        <!--<div class="form-group">
+                            <label>&lt;!&ndash;<span class="required-label">*</span>&ndash;&gt;New Password:</label>
+                            <input type="text" class="form-control" placeholder="New Password" ng-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label>&lt;!&ndash;<span class="required-label">*</span>&ndash;&gt;Confirm New Password:</label>
+                            <input type="text" class="form-control" placeholder="Confirm New Password" ng-required="true">
+                        </div>-->
+                    </div>
+                    <!--INVITE Message Modal-->
+                    <form role="form" novalidate ng-submit="submit()">
+                        <div class="modal fade" id="changePass" tabindex="-1" role="dialog" aria-labelledby="passChange" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                        <h3 class="modal-title" id="passChange">Change Password</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!--<div class="form-group">-->
+                                            <!--<label>&lt;!&ndash;<span class="required-label">*</span>&ndash;&gt;Old Password:</label>-->
+                                            <!--<input type="password" class="form-control" placeholder="Old Password" ng-required="true">-->
+                                        <!--</div>-->
+                                        <div class="form-group">
+                                            <label><!--<span class="required-label">*</span>-->New Password:</label>
+                                            <input type="password" ng-model="accountSettings.newPassword" class="form-control" placeholder="New Password" ng-required="true">
+                                        </div>
+                                        <div class="form-group">
+                                            <label><!--<span class="required-label">*</span>-->Re-type New Password:</label>
+                                            <input type="password" ng-model="accountSettings.confirmNewPassword" class="form-control" placeholder="Re-type New Password" ng-required="true">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline btn-primary" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary" ng-click="updateOnPassword()">Update</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+                    </form>
+                    <!-- /.modal -->
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-6"></div>
+                    <button class="btn btn-primary">&nbsp;&nbsp; Cancel &nbsp; &nbsp;</button>
+                    <button type="submit" ng-click="submitChanges()" class="btn btn-primary">Save Changes</button>
+                </div>
+
+                <!-- /.row (nested) -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </form>
+    <!-- /.col-lg-12 -->
+</div>

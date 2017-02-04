@@ -1,0 +1,96 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Summary Report</h1>
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="help-block">This report shows the list of the projects that the organization have handled for the year. Details like start date, end date, and status can also be viewed. Further details of the summary can be viewed by clicking on the "See Summary" link.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-3">
+                <label>Filter by Year:</label>
+                <select ng-model="year" class="form-control">
+                    <option>2017</option>
+                    <option>2018</option>
+                    <option>2019</option>
+                    <option>2020</option>
+                    <option>2021</option>
+                    <option>2022</option>
+                    <option>2023</option>
+                    <option>2024</option>
+                    <option>2025</option>
+                </select>
+            </div>
+        </div>
+        <br/>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                List of Projects
+                <div class="p-summary-icons">
+                    <a href="" ng-click="printSummaryReport()"><i class="fa fa-print fa-fw"></i></a>
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <div class="Table">
+                        <div class="Heading divthead">
+                            <div class="Cell">
+                                <span>Project Name</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Start Date</span>
+                            </div>
+                            <div class="Cell">
+                                <span>End Date</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Status</span>
+                            </div>
+                            <div class="Cell">
+                                <!--<span>Performance</span>-->
+                            </div>
+                        </div>
+                        <div class="Row" ng-repeat="summary in summaries track by $index">
+                            <div class="Cell">
+                                <span>{{summary.project.title}}</span>
+                            </div>
+                            <div class="Cell">
+                                <span>{{summary.project.startDate | date:'MM/dd/yyyy'}}</span>
+                            </div>
+                            <div class="Cell">
+                                <span>{{summary.project.endDate | date:'MM/dd/yyyy'}}</span>
+                            </div>
+                            <div class="Cell">
+                                <span>{{summary.project.status}}</span>
+                            </div>
+                            <div class="Cell">
+                                <button type="button" ng-click="seeSummary($index)" class="btn btn-link"><p><i class="fa fa-info"></i>&nbsp;See Summary</p></button>
+                            </div>
+                        </div>
+                        <!--<div class="Row">-->
+                        <!--<div class="Cell">-->
+                        <!--<span>Project Name</span>-->
+                        <!--</div>-->
+                        <!--<div class="Cell">-->
+                        <!--<span>Start Date</span>-->
+                        <!--</div>-->
+                        <!--<div class="Cell">-->
+                        <!--<span>End Date</span>-->
+                        <!--</div>-->
+                        <!--<div class="Cell">-->
+                        <!--<span>Status</span>-->
+                        <!--</div>-->
+                        <!--<div class="Cell">-->
+                        <!--<button type="button" class="btn btn-link"><p><i class="fa fa-info"></i>&nbsp;See Summary</p></button>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+                <!-- /.table-responsive -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+</div>

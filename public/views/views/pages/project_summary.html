@@ -1,0 +1,90 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Project Summary</h1>
+        <p class="help-block">The project summary report shows the list of donors who have helped in this project by offering resources. It also shows
+            the list of activites done in the project including the resources used in the said activity.</p>
+        <span class="proj-summary-title">{{project.title}}</span>
+        <span class="p-summary-icons">
+            <button class="btn btn-default btn-sm" ng-click="editProjectSummary()"><i class="fa fa-edit fa-fw"></i>Edit</button>&nbsp;
+            <button class="btn btn-default btn-sm" ng-click="printSummaryReport()"><i class="fa fa-print fa-fw"></i>Print</button>
+        </span>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                List of Donors
+                <!--<div class="p-summary-icons">-->
+                    <!--<a href="" ng-click="printSummaryReport()"><i class="fa fa-print fa-fw"></i></a>-->
+                <!--</div>-->
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <div class="Table">
+                        <div class="Heading divthead">
+                            <div class="Cell">
+                                <span>Donor Name</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Resources</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Quantity</span>
+                            </div>
+                        </div>
+                        <div class="Row" ng-repeat="donor in projectDonors track by $index">
+                            <div class="Cell">
+                                <p>{{donor.from.orgname}}</p>
+                            </div>
+                            <div class="Cell">
+                                <p ng-repeat="resource in donor.resources track by $index">{{resource.type}}({{resource.description}})</p>
+                            </div>
+                            <div class="Cell">
+                                <p ng-repeat="resource in donor.resources track by $index">{{resource.donated}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.table-responsive -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Activities
+                <div class="p-summary-icons">
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <div class="Table">
+                        <div class="Heading divthead">
+                            <div class="Cell">
+                                <span>Activity Name</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Resources</span>
+                            </div>
+                            <div class="Cell">
+                                <span>Quantity</span>
+                            </div>
+                        </div>
+                        <div class="Row" ng-repeat="activity in summaryReport.activities track by $index">
+                            <div class="Cell">
+                                <p>{{activity.name}}</p>
+                            </div>
+                            <div class="Cell">
+                                <p ng-repeat="resource in activity.resources track by $index">{{resource.type}} ({{resource.description}})</p>
+                            </div>
+                            <div class="Cell">
+                                <p ng-repeat="resource in activity.resources track by $index">{{resource.qty}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+        </div>
+    </div>
+</div>

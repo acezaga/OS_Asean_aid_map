@@ -1,0 +1,223 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Edit Profile</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<toaster-container></toaster-container>
+
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <form role="form" novalidate ng-submit="submit()">
+                        <p class="required-block">* Required</p>
+                        <legend>Organization Information&nbsp;<span class="legend-block">(What the organization is all about?)</span></legend>
+                        <div class="form-group">
+                            <label><span class="required-label">*</span>Organization Name:</label>
+                            <input class="form-control" ng-maxlength="50" ng-model="userDetails.orgname" placeholder="Organization Name" ng-required="true">
+                            <!-- <p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <div class="form-group">
+                            <label>Organization Description:</label>
+                            <textarea ng-model="userDetails.description" class="form-control" rows="3" placeholder="A description of your organization..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Mission:</label>
+                            <textarea ng-model="userDetails.mission" class="form-control" rows="3" placeholder="Mission of the organization..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Vision:</label>
+                            <textarea ng-model="userDetails.vision" class="form-control" rows="3" placeholder="Vision of the organization..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label><span class="required-label">*</span>Sector:</label>
+                            <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('sector')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="row" ng-repeat="sec in sectorSet.sectors track by $index">
+                                <div class="form-group col-lg-10">
+                                    <select class="form-control input-group" ng-model="sec.type" ng-options="sector for sector in sectorTypes" ng-required="true">
+                                        <option value hidden>Select a Sector</option>
+                                    </select>
+                                    <!--<span class="col-md-1">-->
+                                    <!--<button ng-click="removeField($index, 'sector')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>-->
+                                    <!--</button>-->
+                                    <!--</span>-->
+                                </div>
+                                <span class="input-group-btn">
+                                    <button ng-click="removeField($index,'sector')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <br/>
+                        <legend>Organization Address&nbsp;<span class="legend-block">(Where is the organization located?)</span></legend>
+                        <div class="form-group">
+                            <label><span class="required-label">*</span>Country:</label>
+                            <select class="form-control" ng-model="userDetails.country">
+                                <option>Brunei Darussalam</option>
+                                <option>Cambodia</option>
+                                <option>Indonesia</option>
+                                <option>Lao PDR</option>
+                                <option>Malaysia</option>
+                                <option>Myanmar</option>
+                                <option>Philippines</option>
+                                <option>Singapore</option>
+                                <option>Thailand</option>
+                                <option>Vietnam</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Organization Address:</label>
+                            <input class="form-control" ng-maxlength="90" ng-model="userDetails.address">
+                            <!--<p class="help-block">Example block-level help text here.</p> -->
+                        </div>
+                        <br/>
+                        <!--NEW RESOURCE PART-->
+                        <legend><span class="required-label">*</span>Available Resources&nbsp;<span class="legend-block">(What are the resources you can offer?)</span></legend>
+                        <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('resource')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        <div class="row">
+                            <div class="form-group" ng-repeat="res in resourceSet.resource track by $index">
+                                <div class="col-lg-12">
+                                    <select class="form-control input-group" name="sector" ng-model="res.type" ng-options="resource for resource in resourcesTypes" required>
+                                        <span class="input-group-addon"><a href="#">+</a></span>
+                                        <option value hidden>Select a Resource</option>
+                                    </select>
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <div ng-if="activateField(res.type, 'DescQty')">
+                                    <div ng-if="activateField(res.type, 'Desc')">
+                                        <div class="col-lg-7">
+                                            <!--<input type="text" class="form-control" ng-model="res.description" placeholder="description">-->
+                                            <select class="form-control" name="sector" ng-model="res.description" ng-options="description for description in getDescriptionRes(res.type)"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <input type="number" class="form-control" ng-model="res.quantity" placeholder="Qty">
+                                    </div>
+                                        <span class="input-group-btn">
+                                            <button ng-click="removeField($index,'resource')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>
+                                            </button>
+                                        </span>
+                                </div>
+                                <!-- <hr>-->
+                            </div>
+                        </div>
+                        <legend><span class="required-label">*</span>Awards & Certifications &nbsp;<span class="legend-block">(What are the achievements of the org?)</span></legend>
+                        <div class="form-group">
+	                            <span class="input-group-btn">
+	                                <button ng-click="addNewField('award')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+	                            </span>
+                        </div>
+                        <div class="row" ng-repeat="awrd in awardSet.awards track by $index">
+                            <div class="form-group col-lg-10" >
+                                <input type="text" class="form-control" ng-maxlength="50" g-model="awrd.type" required>
+                                <!--<span class="col-md-1">-->
+                                <!--<button ng-click="removeField($index, 'award')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>-->
+                                <!--</button>-->
+                                <!--</span>-->
+                            </div>
+                            <span class="input-group-btn">
+                                <button ng-click="removeField($index,'award')" class="btn btn-default" type="button"><i class="fa fa-minus"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <br/>
+                        <br/>
+                        <legend>Contact&nbsp;<span class="legend-block">(How to contact the organization?)</span></legend>
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Email</label>
+                                <div class="col-lg-6">
+                                    <input type="email" class="form-control" ng-model="userDetails.contacts.email" placeholder="email@email.com" required>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Tel No.</label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" ng-model="userDetails.contacts.telNo" placeholder="Tel. No" required>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2"><span class="required-label">*</span>Website</label>
+                                <div class="col-lg-6">
+                                    <input type="url" class="form-control" ng-model="userDetails.contacts.website" placeholder="http://" required>
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <label><span class="required-label">*</span>Contact Information:</label>
+                            <div class="form-group" ng-required="true">
+                                <label class="col-lg-2">Email</label>
+                                <div class="col-lg-4">
+                                    <input type="text" class="form-control" placeholder="Email" ng-model="userDetails.contacts.email">
+                                </div>
+                                <label class="col-lg-2">Tel No.</label>
+                                <div class="col-lg-4">
+                                    <input type="text" class="form-control" placeholder="Tel No." ng-model="userDetails.contacts.telNo">
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group" ng-required="true">
+                                <label class="col-lg-2">Website</label>
+                                <div class="col-lg-4">
+                                    <input type="text" class="form-control" placeholder="http://" ng-model="userDetails.contacts.website">
+                                </div>
+                            </div>
+                        </div>-->
+                    </form>
+                </div>
+                <!-- /.col-lg-6 (nested) -->
+                <div class="col-lg-6">
+                    <!--<h1>Disabled Form States</h1>-->
+                    <form role="form">
+                        <br/>
+                        <legend>Organization Profile Picture&nbsp;</legend>
+                        <div class="form-group">
+                            <input type="file" ng-model="profilePicture" base-sixty-four-input accept="image/*">
+                            <label>Upload Profile Picture</label>
+                            <span class="help-block">Ex. Organization Logo</span>
+                        </div>
+                    </form>
+                    <div class="projpp">
+                        <!--<img src="images/img/silent_underdogs.png">-->
+                        <img class="img-circle" alt="avatar" data-ng-src="data:image/png;base64,{{userDetails.picture}}" />
+                    </div>
+                    <hr>
+                    <br/>
+                    <br/>
+                </div>
+                <!-- /.col-lg-6 (nested) -->
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6"></div>
+                <button type="reset" class="btn btn-primary">&nbsp;&nbsp; &nbsp;Cancel&nbsp;&nbsp; &nbsp;</button>
+                <button type="submit" ng-click="saveUpdates()" class="btn btn-primary">Save Changes</button>
+            </div>
+            <!-- /.row (nested) -->
+        </div>
+        <!-- /.panel-body -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>

@@ -1,0 +1,423 @@
+<ul class="nav navbar-top-links navbar-right">
+    <li class="dropdown" ng-controller="inboxController" ng-if="authentication">
+        <a class="dropdown-toggle" data-toggle="dropdown" ng-click="changeSeenMessage()">
+            <div class="message-mini">
+                <span class="badge" ng-if="unseenMessage > 0">{{unseenMessage}}</span>
+                <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
+            </div>
+        </a>
+        <ul class="dropdown-menu dropdown-messages">
+            <div ng-repeat="message in messages">
+                <li ng-if="message.type == 'private'">
+                    <a href="" ng-click="">
+                        <div>
+                            <strong>{{message.from.name}}</strong>
+                            <span class="pull-right text-muted">
+                                <em>{{message.dateCreated | date: 'medium'}}</em>
+                            </span>
+                        </div>
+                        <div>{{message.message}}</div>
+                    </a>
+                </li>
+                <li ng-if="message.type == 'group'">
+                    <a href="" ng-click="">
+                        <div class="notif">
+                            <p class="pull-right text-muted">
+                                <em>{{message.dateCreated | date: 'medium'}}</em>
+                            </p>
+                            <br/>
+                            <div>
+                            <strong>{{message.to.name}}</strong>
+                            </div>
+                            <div>{{message.message}}</div>
+                        </div>
+                    </a>
+                </li>
+            </div>
+            <li class="divider"></li>
+            <li>
+                <a class="text-center btn btn-link" data-toggle="modal" data-target="#createMessage">
+                    <i class="fa fa-plus"></i>
+                    <strong>View All</strong>
+                </a>
+            </li>
+        </ul>
+        <!-- /.dropdown-messages -->
+    </li>
+    <!-- /.dropdown -->
+    <!--<li class="dropdown">-->
+        <!--<a class="dropdown-toggle" data-toggle="dropdown">-->
+            <!--<i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>-->
+        <!--</a>-->
+        <!--<ul class="dropdown-menu dropdown-tasks">-->
+            <!--<li>-->
+                <!--<a href="#">-->
+                    <!--<div>-->
+                        <!--<p>-->
+                            <!--<strong>Task 1</strong>-->
+                            <!--<span class="pull-right text-muted">40% Complete</span>-->
+                        <!--</p>-->
+                        <!--<div class="progress progress-striped active">-->
+                            <!--<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">-->
+                                <!--<span class="sr-only">40% Complete (success)</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</a>-->
+            <!--</li>-->
+            <!--<li class="divider"></li>-->
+            <!--<li>-->
+                <!--<a href="#">-->
+                    <!--<div>-->
+                        <!--<p>-->
+                            <!--<strong>Task 2</strong>-->
+                            <!--<span class="pull-right text-muted">20% Complete</span>-->
+                        <!--</p>-->
+                        <!--<div class="progress progress-striped active">-->
+                            <!--<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">-->
+                                <!--<span class="sr-only">20% Complete</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</a>-->
+            <!--</li>-->
+            <!--<li class="divider"></li>-->
+            <!--<li>-->
+                <!--<a href="#">-->
+                    <!--<div>-->
+                        <!--<p>-->
+                            <!--<strong>Task 3</strong>-->
+                            <!--<span class="pull-right text-muted">60% Complete</span>-->
+                        <!--</p>-->
+                        <!--<div class="progress progress-striped active">-->
+                            <!--<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">-->
+                                <!--<span class="sr-only">60% Complete (warning)</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</a>-->
+            <!--</li>-->
+            <!--<li class="divider"></li>-->
+            <!--<li>-->
+                <!--<a href="#">-->
+                    <!--<div>-->
+                        <!--<p>-->
+                            <!--<strong>Task 4</strong>-->
+                            <!--<span class="pull-right text-muted">80% Complete</span>-->
+                        <!--</p>-->
+                        <!--<div class="progress progress-striped active">-->
+                            <!--<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%">-->
+                                <!--<span class="sr-only">80% Complete (danger)</span>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</a>-->
+            <!--</li>-->
+            <!--<li class="divider"></li>-->
+            <!--<li>-->
+                <!--<a class="text-center" href="#">-->
+                    <!--<strong>See All Tasks</strong>-->
+                    <!--<i class="fa fa-angle-right"></i>-->
+                <!--</a>-->
+            <!--</li>-->
+        <!--</ul>-->
+        <!--&lt;!&ndash; /.dropdown-tasks &ndash;&gt;-->
+    <!--</li>-->
+    <!-- /.dropdown -->
+    <li class="dropdown" ng-controller="notificationController" ng-if="authentication">
+        <a class="dropdown-toggle" data-toggle="dropdown" ng-click="changeSeenNotif()">
+            <div class="notif-mini">
+                <span class="badge" ng-if="unseenNotif > 0">{{unseenNotif}}</span>
+                <i class="fa fa-bell fa-fw"></i><i class="fa fa-caret-down"></i>
+            </div>
+        </a>
+        <ul class="dropdown-menu dropdown-alerts">
+            <div ng-repeat="notification in notifications">
+                    <li>
+                        <!--Connection Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'AddConnection' && !notification.answered && notification.from.id != account._id">
+                                <span class="pull-left text-muted small"> <i class="fa fa-user fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} added you as a connection. <br/><br/>
+                                <span class="small btn btn-link" data-toggle="modal" data-target="#conCheckStat" ng-click="checkConnectionStats(account._id, notification.from.id)">Check Statistics</span> &nbsp; &nbsp;
+                                <button type="button" ng-click="answerConnection(true,notification)" class="btn btn-primary btn-xs">Accept</button>
+                                <button type="button" ng-click="answerConnection(false,notification)" class="btn btn-outline btn-danger btn-xs">Decline</button>
+                            </div>
+                        </div>
+                        <!--Collab Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'ApplyCollaboration' && !notification.answered && notification.from.id != account._id">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} sent a request for collaboration on your project {{notification.to.project.title}}. <br/><br/>
+                                <span class="small btn btn-link"  data-toggle="modal" data-target="#colCheckStat" ng-click="checkCollabStats(notification.from._id, notification.to.project._id)">Check Statistics</span> &nbsp; &nbsp;
+                                <button type="button" ng-click="answerCollaboration(true,notification)" class="btn btn-primary btn-xs">Accept</button>
+                                <button type="button" ng-click="answerCollaboration(false,notification)" class="btn btn-outline btn-danger btn-xs">Decline</button>
+                            </div>
+                        </div>
+                        <div class="notif">
+                            <div ng-if="notification.type == 'InviteCollaboration' && !notification.answered && notification.from.id != account._id">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} sent a invite for collaboration on {{notification.from.project.title}}. <br/><br/>
+                                <span class="small btn btn-link" data-toggle="modal" data-target="#colCheckStat" ng-click="checkCollabStats(notification.to._id, notification.from.project._id)">Check Statistics</span> &nbsp; &nbsp;
+                                <button type="button" ng-click="answerInviteCollaboration(true,notification)" class="btn btn-primary btn-xs">Accept</button>
+                                <button type="button" ng-click="answerInviteCollaboration(false,notification)" class="btn btn-outline btn-danger btn-xs">Decline</button>
+                            </div>
+                        </div>
+                        <!--Donation Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'Donation' && !notification.answered && notification.from.id != account._id">
+                                <span class="pull-left text-muted small"> <i class="fa fa-gift fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} donated resources to your project {{notification.to.project.title}}. <br/><br/>
+                                <span class="small btn btn-link" data-toggle="modal" data-target="#listOfDonation" ng-click="setDonationList(notification.donation)">List of Donations</span> &nbsp; &nbsp;
+                                <button type="button" ng-click="answerDonation(true,notification)" class="btn btn-primary btn-xs">Accept</button>
+                                <button type="button" ng-click="answerDonation(false,notification)" class="btn btn-outline btn-danger btn-xs">Decline</button>
+                            </div>
+                        </div>
+                        <!--Connection Accepted Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'AddConnection' && notification.answered && notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-user fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} is now connected with {{notification.to.name}}. <br/><br/>
+                            </div>
+                        </div>
+                        <!--Connection Rejected Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'AddConnection' && notification.answered && !notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-user fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} connection request was rejected by {{notification.to.name}}. <br/><br/>
+                            </div>
+                        </div>
+                        <!--Collab Accept Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'ApplyCollaboration' && notification.answered && notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} are now a collaborator in the {{notification.to.project.title}}. <br/><br/>
+                            </div>
+                        </div>
+                        <div class="notif">
+                            <div ng-if="notification.type == 'InviteCollaboration' && notification.answered && notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.to.name}} are now a collaborator in the {{notification.from.project.title}}. <br/><br/>
+                            </div>
+                        </div>
+                        <!--Collab Reject Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'ApplyCollaboration' && notification.answered && !notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain-broken fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} collaboration request to the {{notification.to.project.title}} was rejected by {{notification.to.name}}. <br/><br/>
+                            </div>
+                            <div ng-if="notification.type == 'InviteCollaboration' && notification.answered && !notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-chain-broken fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} invitation for collaboration request to the {{notification.from.project.title}} was rejected by {{notification.to.name}}. <br/><br/>
+                            </div>
+                        </div>
+                        <!--Donation Accept Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'Donation' && notification.answered && notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-gift fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} donation to {{notification.to.project.title}} was accepted. <br/><br/>
+                            </div>
+                        </div>
+                        <!--Donation Reject Notif-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'Donation' && notification.answered && !notification.answer">
+                                <span class="pull-left text-muted small"> <i class="fa fa-gift fa-fw"></i>{{notification.date}}</span><br/>
+                                {{notification.from.name}} donation to {{notification.to.project.title}} was rejected. <br/><br/>
+                            </div>
+                        </div>
+                        <!--EVALUATION NOTIF-->
+                        <div class="notif">
+                            <div ng-if="notification.type == 'Evaluation' && !notification.answered">
+                                <span class="pull-left text-muted small"> <i class="fa fa-search fa-fw"></i>notif-date</span><br/>
+                                PROJECT NAME recently got completed. As a collaborator to the project, kindly evaluate the performance its
+                                initiators, ORG INITIATOR NAME. <br/><br/>
+                                <button ng-click="goToPerformanceReview(notification.content)" type="button" class="btn btn-primary btn-xs">Evaluate</button>
+                            </div>
+                        </div>
+                        <div class="notif">
+                            <div ng-if="notification.type == 'FinishedProject'">
+                                <span class="pull-left text-muted small"> <i class="fa fa-search fa-fw"></i>notif-date</span><br/>
+                                Your project, {{notification.content}}, has been completed. Check the performance evaluation page for
+                                your performance rating on this project.  <br/><br/>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="divider"></li>
+
+            </div>
+            <li>
+                <a class="text-center" href="#">
+                    <!--<strong>More Alerts</strong>-->
+                    <strong ng-if="notifications.length < 1">No New Alerts</strong>
+                   <!-- <i class="fa fa-angle-right"></i>-->
+                </a>
+            </li>
+        </ul>
+        <!-- /.dropdown-alerts -->
+        <!-- Connection Check Stat MODAL -->
+        <div class="modal fade" id="conCheckStat" tabindex="-1" role="dialog" aria-labelledby="conStat" aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="conStat">Connection Matching Statistics</h3>
+                    </div>
+                        <div class="modal-body">
+                            <label>Matched Resources</label>
+                            <div>
+                                <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                    <span ng-if="(resource.description)">{{resource.type}}({{resource.description}})</span>
+                                    <span ng-if="(!resource.description)">{{resource.type}}</span>
+                                </div>
+                                <!--<div class="pop-suggest-text">-->
+                                    <!--<span>ResourceName: project needs #ofneed</span>-->
+                                <!--</div>-->
+                            </div>
+                            <br/>
+                            <label>Proximity</label>
+                            <div class="pop-suggest-text">
+                                <span>Location: {{projectLocation}}</span><br/>
+                                <span>You have {{matchedConnCollab}} similar connection(s)</span>
+                            </div>
+                            <br/>
+                            <div>
+                                <label>Matched sectors</label>
+                                <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <!-- List of Donation MODAL -->
+        <div class="modal fade" id="listOfDonation" tabindex="-1" role="dialog" aria-labelledby="donationList" aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="donationList">List of Donations</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label>Donations</label>
+                        <ul class="connectionlist">
+                            <div>
+                                <li ng-repeat="donation in donationList"><button type="button" class="btn btn-link">{{donation.type}}({{donation.description}}) - {{donation.donated}}</button></li></br>
+                                <!--<li><button type="button" class="btn btn-link">Donation 2</button></li></br>-->
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <!-- Collab Check Stat Modal -->
+        <div class="modal fade" id="colCheckStat" tabindex="-1" role="dialog" aria-labelledby="colStat" aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="colStat">Collaboration Matching Statistics</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label>Matched Resources</label>
+                        <div>
+                            <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                <span ng-if="(resource.description)">{{resource.type}}({{resource.description}}): needs {{resource.needed | number:0}}</span>
+                                <span ng-if="(!resource.description)">{{resource.type}}: needs {{resource.needed | number:0}}</span>
+                            </div>
+                            <!--<div class="pop-suggest-text">-->
+                                <!--<span>ResourceName: project needs #ofneed</span>-->
+                            <!--</div>-->
+                        </div>
+                        <br/>
+                        <label>Proximity</label>
+                        <div class="pop-suggest-text">
+                            <span>Location: {{projectLocation}}</span><br/>
+                            <span>{{matchedConnCollab}} connection(s) are collaborating in this project</span>
+                        </div>
+                        <br/>
+                        <div>
+                            <label>Matched sectors</label>
+                            <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                        </div>
+                        <br/>
+                        <div>
+                            <label>Time Frame: </label>
+                            <span class="pop-suggest-text">Project started {{currentStatistic.date}} day(s) ago</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </li>
+    <!-- /.dropdown -->
+    <li class="dropdown" ng-controller="indexProfileController" ng-if="authentication">
+        <a class="dropdown-toggle" data-toggle="dropdown">
+            <span>&nbsp;&nbsp;</span>
+            <div class="profile-avatar"><img class="img-circle" data-ng-src="{{ account.picture ? 'data:image/png;base64,'+account.picture :  'images/def-org.jpg'}}" data-err-src="images/def-org.jpg"></div>
+            <div class="user-mini pull-right">
+                <span>{{account.orgname}}</span>
+            </div>
+            <!--<i class="fa fa-caret-down"></i>-->
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="" ng-click="profile()"><i class="fa fa-user fa-fw"></i> Profile</a>
+            </li>
+            <li><a ui-sref="dashboard.accountsettings"><i class="fa fa-gear fa-fw"></i> Account Settings</a>
+            </li>
+            <li class="divider"></li>
+            <li><a href="" ng-click="logout()"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+            </li>
+        </ul>
+        <!-- /.dropdown-user -->
+    </li>
+    <!-- /.dropdown -->
+
+    <li class="dropdown" ng-controller="signInController" ng-if="!authentication">
+        <a class="dropdown-toggle" data-toggle="dropdown">
+            <span>&nbsp;&nbsp;</span>
+            <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+            <form role="form">
+                <div class="form-group">
+                    <li class="col-sm-12"><i class="fa fa-user fa-fw"></i> Username
+                    </li>
+                    <li class="col-sm-12"><input class="form-control" type="text" ng-model="user.username">
+                    </li>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <li class="col-sm-12"><i class="fa fa-lock fa-fw"></i> Password
+                    </li>
+                    <li class="col-sm-12"><input class="form-control" type="password" ng-model="user.password">
+                    </li>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <li ng-if="failedLogin" class="col-sm-12 required-label" id="mismatchcred"><i class="fa fa-warning fa-fw"></i> Username and password did not match. Try again.
+                    </li>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <li class="col-sm-12"><button id="login-btn" class="btn btn-success btn-sm btn-block" ng-click="login()">Login</button>
+                    </li>
+                </div>
+                <li class="divider"></li>
+                <div>
+                    <li><a ui-sref="dashboard.createaccount"><i class="fa fa-sign-out fa-fw"></i> Signup</a>
+                    </li>
+                </div>
+            </form>
+        </ul>
+        <!-- /.dropdown-user -->
+    </li>
+</ul>

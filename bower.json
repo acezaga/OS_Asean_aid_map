@@ -1,0 +1,49 @@
+{
+  "name": "app5",
+  "description": "bower",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "dependencies": {
+    "angular": "*",
+    "json3": "*",
+    "es5-shim": "*",
+    "angular-resource": "*",
+    "angular-cookies": "*",
+    "angular-sanitize": "*",
+    "angular-animate": "*",
+    "angular-touch": "*",
+    "angular-route": "*",
+    "font-awesome": "*",
+    "angular-bootstrap": "*",
+    "oclazyload": "*",
+    "angular-loading-bar": "~*",
+    "angular-ui-router": "*",
+    "angular-toggle-switch": "*",
+    "metisMenu": "*",
+    "angular-chart.js": "*",
+    "angular-socket-io": "*",
+    "underscore": "*",
+    "ngmap": "^1.17.8",
+    "ng-flow": "^2.7.4",
+    "ng-tags-input": "^3.1.1",
+    "angular-flash-alert": "^2.4.0",
+    "AngularJS-Toaster": "angularjs-toaster#^2.1.0",
+    "angular-base64": "^2.0.5",
+    "upload": "^1.0.8",
+    "angular-base64-upload": "^0.1.19",
+    "angular-file-upload": "^2.4.1",
+    "chart.js": "^2.4.0",
+    "pdfmake": "^0.1.24",
+    "angular-local-storage": "^0.5.2"
+  },
+  "devDependencies": {
+    "angular-mocks": "*",
+    "angular-scenario": "*"
+  },
+  "resolutions": {
+    "bootstrap": "*"
+  },
+  "appPath": "app"
+}

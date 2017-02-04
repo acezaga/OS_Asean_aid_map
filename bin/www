@@ -1,0 +1,1015 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('app5:server');
+var http = require('http');
+var mongoose = require('mongoose');
+var scheduler = require('node-schedule');
+var events = require('events');
+var async = require('async');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Create a socket for listening to new messages
+ */
+
+var socketUsers = {};
+
+var io = require('socket.io')(server);
+var eventEmitter = new events.EventEmitter();
+
+//var chatSocket = io.of('/chats');
+//var functionSocket = io.of('/functions');
+
+var user = mongoose.model('accounts');
+var chatMessage = mongoose.model('Chat');
+var project = mongoose.model('Projects');
+var notification = mongoose.model('Notifications');
+var donation = mongoose.model('Donations');
+
+//var startTime = new Date(Date.now() + 5000);
+//var endTime = new Date(startTime.getTime() + 5000);
+//var j = scheduler.scheduleJob({ rule: '*/1 * * * * *' }, function(){
+//    console.log('Time for tea!');
+//});
+
+//function checkForFinished(){
+//    console.log('cron job running');
+//    //find projects that have end dates equal to the current date
+//    var todayDate = new Date();
+//    project.find({endDate: {$lte: todayDate}}, function(err, foundProjects){
+//        for(i = 0; i < foundProjects.length; i++){
+//            foundProjects[i].status = "Completed";
+//            foundProjects[i].save(function(err, updatedProject){
+//                for(j = 0; j < updatedProject.collaboration.length; i++){
+//
+//                    var notif = new notification();
+//
+//                    notif.to.id = updatedProject.collaboration[i];
+//                    //notif.to.name = data.to.orgname;
+//                    //notif.to.project.id = data.project._id;
+//                    //notif.to.project.title = data.project.title;
+//                    //notif.from.id = data.from._id;
+//                    //notif.from.name = data.from.orgname;
+//                    //notif.donation = data.donated;
+//                    notif.title = 'Performance Evaluation';
+//                    notif.type = 'Evaluation';
+//                    notif.content = updatedProject.title;
+//                    notif.answered = false;
+//
+//                    notif.save(function(err, savedNotif){
+//                        io.broadcast.to(socketUsers[updatedProject.collaboration[i]]).emit('performance-evaluation', savedNotif);
+//                    });
+//                }
+//            });
+//        }
+//    });
+//}
+//
+//checkForFinished();
+
+var rule = new scheduler.RecurrenceRule();
+rule.dayOfWeek = [0, 1, 2, 3, 4, 5, 6];
+rule.hour = 0;
+rule.minute = 0;
+
+var j = scheduler.scheduleJob(rule, function(){
+    console.log('cron job running');
+    //find projects that have end dates equal to the current date
+    var todayDate = new Date();
+
+    var calls = [];
+
+    project.find({status: 'Ongoing', endDate: {$lte: todayDate}}, function(err, foundProjects){
+        console.log('found finished projects: '+JSON.stringify(foundProjects));
+        async.eachSeries(foundProjects, function(project, _next){
+            project.status = "Completed";
+            project.save(function(err, updatedProject){
+                var finishNotif = new notification();
+
+                finishNotif.to.id = updatedProject.creator;
+                finishNotif.title = 'Finish Project';
+                finishNotif.type = 'FinishedProject';
+                finishNotif.content = updatedProject.title;
+                finishNotif.answered = false;
+
+                finishNotif.save(function(err, savedFNotif){
+                    var data = {};
+                    data.account = updatedProject.creator;
+                    data.notif = savedFNotif;
+                    //data.creator = updatedProject.creator;
+                    eventEmitter.emit('sendEvaluatation', data);
+                });
+
+                async.eachSeries(updatedProject.collaboration, function(collaboration, next){
+                    var notif = new notification();
+
+                    console.log('collab user: '+collaboration);
+
+                    notif.to.id = collaboration;
+                    notif.title = 'Performance Evaluation';
+                    notif.type = 'Evaluation';
+                    notif.content = updatedProject.title;
+                    notif.answered = false;
+
+                    console.log('before notif: '+collaboration);
+
+                    //calls.push(notif);
+
+                    //_next();
+
+                    notif.save(function(err, savedNotif){
+                        console.log('notif saved: '+savedNotif.to.id);
+                        var data = {};
+                        data.account = collaboration;
+                        data.notif = savedNotif;
+                        data.creator = updatedProject.creator;
+                        eventEmitter.emit('sendEvaluatation', data);
+                        next();
+                        //io.sockets.broadcast.to(socketUsers[updatedProject.collaboration[j]]).emit('performance-evaluation', savedNotif);
+                    });
+                });
+            });
+        });
+        //for(i = 0; i < foundProjects.length; i++){
+        //    foundProjects[i].status = "Completed";
+        //    foundProjects[i].save(function(err, updatedProject){
+        //
+        //
+        //        async.eachSeries(updatedProject.collaboration, function(collaboration, next){
+        //            var notif = new notification();
+        //
+        //            console.log('collab user: '+collaboration);
+        //
+        //            notif.to.id = collaboration;
+        //            notif.title = 'Performance Evaluation';
+        //            notif.type = 'Evaluation';
+        //            notif.content = updatedProject.title;
+        //            notif.answered = false;
+        //
+        //            console.log('before notif: '+collaboration);
+        //
+        //            //calls.push(notif);
+        //
+        //            //_next();
+        //
+        //            notif.save(function(err, savedNotif){
+        //                console.log('notif saved: '+savedNotif.to.id);
+        //                var data = {};
+        //                data.account = collaboration;
+        //                data.notif = savedNotif;
+        //                data.creator = updatedProject.creator;
+        //                eventEmitter.emit('sendEvaluatation', data);
+        //                next();
+        //                //io.sockets.broadcast.to(socketUsers[updatedProject.collaboration[j]]).emit('performance-evaluation', savedNotif);
+        //            });
+        //        });
+        //    });
+        //}
+    });
+});
+
+io.on('connection', function(socket){
+
+    eventEmitter.on('sendEvaluatation', function(data){
+        socket.broadcast.to(socketUsers[data.account]).emit('performance-evaluation', data.notif);
+        //socket.broadcast.to(socketUsers[data.creator]).emit('performance-evaluation', data.notif);
+    });
+
+  socket.on('LoginUser', function(data){
+    //if(data._id in socketUsers){
+    //  return;
+    //}
+    //else{
+    socketUsers[data._id] = socket.id;
+    console.log('data id: '+socketUsers[data._id]);
+    //}
+    console.log('a user has connected');
+  });
+
+    socket.on('disconnect', function(data){
+        delete socketUsers[data];
+
+        console.log('a user disconnected: '+data);
+    });
+
+  socket.on('join-room', function(data, callback){
+      socket.join(data);
+  });
+
+  socket.on('new-message', function(data, callback){
+    console.log('message', data);
+
+    async.eachSeries(data.to, function(recipient, next){
+        var newChat = new chatMessage();
+        newChat.from.id = data.from._id;
+        newChat.from.name = data.from.orgname;
+        newChat.to.id = recipient.account._id;
+        if(recipient.type == 'private') {
+            newChat.to.name = recipient.account.orgname;
+        }
+        else{
+            newChat.to.name = recipient.account.title;
+        }
+        newChat.type = recipient.type;
+        newChat.subject = data.subject;
+        //newChat.dateCreated = data.dateCreated;
+        newChat.message = data.content;
+
+        //newChat.members = data.members;
+
+        newChat.save(function (err, newChat) {
+            if (err) {
+                console.log('error', err);
+            }
+            //if (newChat.type == 'private') {
+            //    socket.broadcast.to(socketUsers[newChat.to.id]).emit('new-message', newChat);
+            //} else {
+            //    socket.to(newChat.to.id).emit('new-message', newChat);
+            //}
+            if(newChat.type == 'private') {
+                socket.broadcast.to(socketUsers[newChat.to.id]).emit('new-message', {message: newChat});
+            }
+            else{
+                socket.broadcast.to(newChat.to.id).emit('new-message', {message: newChat});
+            }
+            callback({message: newChat});
+        });
+    }, function(err){
+
+    });
+
+    //for(i = 0; i < data.to.length; i++) {
+    //    var newChat = new chatMessage();
+    //    newChat.from.id = data.from._id;
+    //    newChat.from.name = data.from.orgname;
+    //    newChat.to.id = data.to[i].account._id;
+    //    if(data.to[i].type == 'private') {
+    //        newChat.to.name = data.to[i].account.orgname;
+    //    }
+    //    else{
+    //        newChat.to.name = data.to[i].account.title;
+    //    }
+    //    newChat.type = data.to[i].type;
+    //    newChat.subject = data.subject;
+    //    //newChat.dateCreated = data.dateCreated;
+    //    newChat.message = data.content;
+    //
+    //    //newChat.members = data.members;
+    //
+    //    newChat.save(function (err, newChat) {
+    //        if (err) {
+    //            console.log('error', err);
+    //        }
+    //        //if (newChat.type == 'private') {
+    //        //    socket.broadcast.to(socketUsers[newChat.to.id]).emit('new-message', newChat);
+    //        //} else {
+    //        //    socket.to(newChat.to.id).emit('new-message', newChat);
+    //        //}
+    //        if(newChat.type == 'private') {
+    //            socket.broadcast.to(socketUsers[newChat.to.id]).emit('new-message', {message: newChat});
+    //        }
+    //        else{
+    //            socket.broadcast.to(newChat.to.id).emit('new-message', {message: newChat});
+    //        }
+    //        callback({message: newChat});
+    //    });
+    //}
+    //callback(newChat);
+  });
+
+  socket.on('chat-history', function(data, callback){
+    chatMessage.find({$and: [{$or: [{'from.id': data.from}, {'from.id': data.to}]},{$or: [{'to.id': data.from}, {'to.id': data.to}]}], type: 'private'}, function(err, chatMessage){
+        if(err){
+            return callback({status: false});
+        }
+        if(chatMessage.length < 1){
+            return callback({status: false});
+        }
+        console.log(chatMessage);
+        callback({status: true, messages: chatMessage});
+    });
+    //chatMessage.find({$or: [{'from.id': data.from}, {'from.id': data.to}, {'to.id': data.from}, {'to.id': data.to}], type: 'private'}, function(err, chatMessage){
+    //  if(err){
+    //    return callback({status: false});
+    //  }
+    //  if(chatMessage.length < 1){
+    //      return callback({status: false});
+    //  }
+    //  console.log(chatMessage);
+    //  callback({status: true, messages: chatMessage});
+    //});
+  });
+
+  socket.on('chat-history-group', function(data, callback){
+     chatMessage.find({'to.id': data.to, type: 'group'}, function(err, chatMessage){
+         if(err){
+             return callback({status: false});
+         }
+         if(chatMessage.length < 1){
+             return callback({status: false});
+         }
+         console.log(chatMessage);
+         callback({status: true, messages: chatMessage});
+     });
+  });
+
+  socket.on('all-chat-history', function(data, callback){
+      var accountId = data.id;
+      var groups = data.groups;
+
+      //chatMessage.distinct('_id',{$or:[{'to.id': accountId}, {'to.id': {$in: groups}}]}).sort({dateCreated: 'desc'}).limit(5).exec(function(err, chatMessage){
+      //    if(err){
+      //        return callback({status: false});
+      //    }
+      //    if(chatMessage.length < 1){
+      //        return callback({status: false});
+      //    }
+      //
+      //    callback({status: true, messages: chatMessage});
+      //});
+
+      chatMessage.aggregate(
+          {$match: {$or:[{'to.id': accountId}, {'to.id': {$in: groups}}]}},
+          {$sort: {dateCreated: -1}},
+          {$group: {'_id': '$from.id', 'id': {'$first': '$_id'}, 'name': {'$first': '$from.name'}, 'to': {'$first': '$to'}, 'message': {'$first': '$message'}, 'dateCreated': {'$first': '$dateCreated'}, 'type': {'$first': '$type'}, 'seen': {'$first': '$seen'}}},
+          {$project: {'_id': '$id', 'from.id': '$_id', 'from.name': '$name', 'to': 1, 'type': 1, 'dateCreated': 1, 'message': 1, 'seen': 1}},
+          {$limit: 6},
+          function(err, chatMessage){
+              if(err){
+                  return callback({status: false});
+              }
+              if(chatMessage.length < 1){
+                  return callback({status: false});
+              }
+
+              console.log('history messages: '+JSON.stringify(chatMessage));
+
+              callback({status: true, messages: chatMessage});
+          }
+      );
+
+      //chatMessage.distinct('_id',{$or:[{'to.id': accountId}, {'to.id': {$in: groups}}]}, function(err, chatMessage){
+      //    if(err){
+      //        return callback({status: false});
+      //    }
+      //    if(chatMessage.length < 1){
+      //        return callback({status: false});
+      //    }
+      //
+      //    callback({status: true, messages: chatMessage});
+      //
+      //}).limit(5).sort({dateCreated: desc});
+  });
+
+  socket.on('new-donation', function(data, callback){
+      console.log('donation: '+data.donated[0].type);
+      console.log('donation size: '+data.donated.length);
+
+      var notif = new notification();
+
+      notif.to.id = data.to._id;
+      notif.to.name = data.to.orgname;
+      notif.to.project.id = data.project._id;
+      notif.to.project.title = data.project.title;
+      notif.from.id = data.from._id;
+      notif.from.name = data.from.orgname;
+      notif.donation = data.donated;
+      notif.title = 'New Donation Request';
+      notif.type = 'Donation';
+      notif.content = "";
+      notif.answered = false;
+
+      notif.save(function(err, savedNotif){
+          console.log('notif donation: '+notif.donation[0]);
+          if(err){
+              console.log('error: '+err);
+              callback({status: false})
+          }else{
+              socket.broadcast.to(socketUsers[data.to._id]).emit('new-donation', savedNotif);
+              callback({status: true, cbNotification: savedNotif});
+          }
+      });
+
+  });
+
+  //socket.on('new-notification', function(data, callback){
+  //
+  //});
+
+  socket.on('new-connection', function(data, callback){
+
+      console.log('a connection request sent');
+
+      var notif = new notification();
+
+      notif.to.id = data.to._id;
+      notif.to.name = data.to.orgname;
+      notif.from.id = data.from._id;
+      notif.from.name = data.from.orgname;
+      notif.title = 'New Connection Request';
+      notif.type = 'AddConnection';
+      notif.content = "";
+      notif.answered = false;
+      //notif.answer = false;
+
+      notif.save(function(err, savedNotif){
+          if(err){
+              console.log('error: '+err);
+              callback({status: false})
+          }else{
+              socket.broadcast.to(socketUsers[data.to._id]).emit('new-connection', savedNotif);
+              callback({status: true, cbNotification: savedNotif});
+          }
+      });
+
+  });
+
+  socket.on('new-apply-collaboration', function(data, callback){
+      var appnotif = new notification();
+
+      appnotif.to.id = data.to._id;
+      appnotif.to.name = data.to.orgname;
+      appnotif.to.project.id = data.project._id;
+      appnotif.to.project.title = data.project.title;
+      appnotif.from.id = data.from._id;
+      appnotif.from.name = data.from.orgname;
+      appnotif.title = data.subject;
+      appnotif.type = 'ApplyCollaboration';
+      appnotif.content = data.purpose;
+      appnotif.answered = false;
+      //appnotif.anwswer = false;
+
+
+      appnotif.save(function(err, savedNotif){
+          if(err){
+              console.log('error: '+err);
+              callback({status: false})
+          }else{
+              socket.broadcast.to(socketUsers[data.to._id]).emit('new-apply-collaboration', savedNotif);
+              callback({status: true, cbNotification: savedNotif});
+          }
+      });
+  });
+
+    socket.on('response-apply-collaboration', function(data, callback){
+        notification.findOne({_id: data.notif._id}, function(err, foundNotification){
+            foundNotification.answer = data.response;
+            foundNotification.answered = true;
+            foundNotification.date = new Date();
+            foundNotification.seen = false;
+
+            foundNotification.save(function(err, updatedNotif){
+                if(err){
+                    return console.log('error: '+err);
+                }
+
+                if(data.response){
+                    project.findOne({_id: updatedNotif.to.project.id}, function(err, foundProject){
+                        foundProject.collaboration.push(updatedNotif.from.id);
+                        foundProject.save(function(err, updatedProject){
+                            socket.broadcast.to(socketUsers[updatedNotif.from.id]).emit('response-apply-collaboration', {project: updatedProject, notification: updatedNotif});
+                            callback({project: updatedProject, notification: updatedNotif});
+                        });
+                    });
+                }
+                else{
+                    socket.broadcast.to(socketUsers[data.to._id]).emit('response-apply-collaboration', {notification: updatedNotif});
+                    callback(updatedNotif);
+                }
+            });
+        });
+    });
+
+    socket.on('new-invite-collaboration', function(data, callback){
+
+        console.log('invited accounts: '+data.to[0].orgname);
+
+        var invitedAccounts = [];
+
+        async.eachSeries(data.to, function(toRecipient, next){
+            console.log('for Each account: '+toRecipient.orgname);
+            var ivnotif = new notification();
+
+            ivnotif.to.id = toRecipient._id;
+            ivnotif.to.name = toRecipient.orgname;
+            ivnotif.from.id = data.from._id;
+            ivnotif.from.name = data.from.orgname;
+            ivnotif.from.project.id = data.project._id;
+            ivnotif.from.project.title = data.project.title;
+            ivnotif.title = '';
+            ivnotif.type = 'InviteCollaboration';
+            ivnotif.content = '';
+            ivnotif.answered = false;
+
+            ivnotif.save(function(err, savedNotif){
+                if(err){
+                    console.log('error: '+err);
+
+                }else{
+                    socket.broadcast.to(socketUsers[toRecipient._id]).emit('new-invite-collaboration', savedNotif);
+                    invitedAccounts.push(toRecipient);
+                    //callback({status: true, cbNotification: savedNotif});
+                }
+
+                next();
+            });
+        }, function(err){
+            if(err){
+                return callback({status: false});
+            }
+
+            callback({status: true, invitedAccounts: invitedAccounts});
+            console.log('invited accounts: '+invitedAccounts);
+
+        });
+
+        //data.to.forEach(function(toRecipient){
+        //    console.log('for Each account: '+toRecipient.orgname);
+        //    var ivnotif = new notification();
+        //
+        //    ivnotif.to.id = toRecipient._id;
+        //    ivnotif.to.name = toRecipient.orgname;
+        //    ivnotif.from.id = data.from._id;
+        //    ivnotif.from.name = data.from.orgname;
+        //    ivnotif.from.project.id = data.project._id;
+        //    ivnotif.from.project.title = data.project.title;
+        //    ivnotif.title = '';
+        //    ivnotif.type = 'InviteCollaboration';
+        //    ivnotif.content = '';
+        //    ivnotif.answered = false;
+        //
+        //    ivnotif.save(function(err, savedNotif){
+        //        if(err){
+        //            console.log('error: '+err);
+        //            callback({status: false})
+        //        }else{
+        //            socket.broadcast.to(socketUsers[toRecipient._id]).emit('new-invite-collaboration', savedNotif);
+        //            invitedAccounts.push(toRecipient._id);
+        //            //callback({status: true, cbNotification: savedNotif});
+        //        }
+        //    });
+        //});
+
+        //callback({status: true, invitedAccounts: invitedAccounts});
+    });
+
+    socket.on('response-invite-collaboration', function(data, callback){
+        notification.findOne({_id: data.notif._id}, function(err, foundNotification){
+            foundNotification.answer = data.response;
+            foundNotification.answered = true;
+            foundNotification.date = new Date();
+            foundNotification.seen = false;
+
+            foundNotification.save(function(err, updatedNotif){
+                if(err){
+                    return console.log('error: '+err);
+                }
+
+                if(data.response){
+                    project.findOne({_id: updatedNotif.from.project.id}, function(err, foundProject){
+                        foundProject.collaboration.push(updatedNotif.to.id);
+                        foundProject.save(function(err, updatedProject){
+                            socket.broadcast.to(socketUsers[updatedNotif.from.id]).emit('response-invite-collaboration', updatedNotif);
+                            callback({notification: updatedNotif, project: updatedProject});
+                        });
+                    });
+                }
+                else{
+                    socket.broadcast.to(socketUsers[updatedNotif.from.id]).emit('response-invite-collaboration', updatedNotif);
+                    callback(updatedNotif);
+                }
+            });
+        });
+    });
+
+    socket.on('response-donation', function(data, callback){
+        console.log('response donation triggered');
+        notification.findOne({_id: data.notif._id}, function(err, foundNotification){
+            foundNotification.answer = data.response;
+            foundNotification.answered = true;
+            foundNotification.date = new Date();
+            foundNotification.seen = false;
+
+            foundNotification.save(function(err, updatedNotif){
+                if(err){
+                    return console.log('error: '+err);
+                }
+
+                console.log('Saved-response-donation-notif');
+
+                if(data.response){
+                    console.log('accepting triggered');
+                    var donate = new donation();
+
+                    donate.projectId = foundNotification.to.project.id;
+                    donate.from = foundNotification.from.id;
+                    donate.resources = foundNotification.donation;
+
+                    donate.save(function(err,savedDonation){
+                        if(err){
+                            return res.send(err);
+                        }
+
+                        project.findOne({_id: foundNotification.to.project.id}, function(err, foundProject){
+                            // insert the donation to the resources of the project
+                            var resourcesUpdates = foundProject.resources;
+                            foundProject.resources = [];
+                            for(i = 0; i < savedDonation.resources.length; i++){
+                                for(j = 0; j < resourcesUpdates.length; j++){
+                                    if(savedDonation.resources[i].type == resourcesUpdates[j].type){
+                                        if(savedDonation.resources[i].description && resourcesUpdates[j].description){
+                                            if(savedDonation.resources[i].description == resourcesUpdates[j].description){
+                                                resourcesUpdates[j].inhand = parseInt(resourcesUpdates[j].inhand) + parseInt(savedDonation.resources[i].donated);
+                                                //console.log('description donation: '+foundProject.resources[j].inhand);
+                                            }
+                                        }
+                                        else{
+                                            resourcesUpdates[j].inhand = parseInt(resourcesUpdates[j].inhand) + parseInt(savedDonation.resources[i].donated);
+                                            console.log('type donation: '+resourcesUpdates[j].inhand);
+                                        }
+                                    }
+                                }
+                                console.log('loop '+i+' done');
+                            }
+
+                            foundProject.resources = resourcesUpdates;
+                            console.log('found project: '+foundProject.resources[0].inhand);
+
+                            foundProject.save(function(err, updatedProject){
+                                if(err){
+                                    console.log(err);
+                                    return res.send(err);
+                                }
+
+                                user.findOne({_id: foundNotification.from.id}, function(err, foundUser){
+
+                                    var userResources = foundUser.resources;
+                                    foundUser.resources = [];
+                                    for(i = 0; i < savedDonation.resources.length; i++){
+                                        for(j = 0; j < userResources.length; j++){
+                                            if(savedDonation.resources[i].type == userResources[j].type){
+                                                if(savedDonation.resources[i].description && userResources[j].description){
+                                                    if(savedDonation.resources[i].description == userResources[j].description){
+                                                        userResources[j].quantity = parseInt(userResources[j].quantity) - parseInt(savedDonation.resources[i].donated);
+                                                    }
+                                                }
+                                                else{
+                                                    userResources[j].quantity = parseInt(userResources[j].quantity) - parseInt(savedDonation.resources[i].donated);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    foundUser.resources = userResources;
+                                    //console.log('found user: '+foundUser.resources[1].quantity);
+                                    //foundUser.resources[1].quantity = "5";
+                                    foundUser.save(function(err, updatedUser){
+                                        //console.log('update user: '+updatedUser.resources[1].quantity);
+                                        socket.broadcast.to(socketUsers[foundNotification.from.id]).emit('response-donation', {notification: updatedNotif, account: updatedUser, project: updatedProject});
+                                        callback({notification: updatedNotif, project: updatedProject});
+                                    });
+                                });
+                            });
+                        });
+                    //    project.findOne({_id: foundNotification.to.project.id}, function(err, foundProject){
+                    //        user.findOne({_id: foundNotification.from.id}, function(err, foundUser){
+                    //            var project;
+                    //            var account;
+                    //            for(i = 0; i < savedDonation.resources.length; i++){
+                    //                var donated = parseInt(savedDonation.resources[i].donated);
+                    //                if(savedDonation.resources[i].description){
+                    //                    foundProject.update({'resources.type': savedDonation.resources[i].type, 'resources.description': savedDonation.resources[i].description},
+                    //                        {'$inc': {'resources.$.inhand': donated}}, function(err, updatedProject){
+                    //                            project = updatedProject;
+                    //                        });
+                    //
+                    //                    foundUser.update({'resources.type': savedDonation.resources[i].type, 'resources.description': savedDonation.resources[i].description},
+                    //                        {'$dec': {'resources.$.quantity': donated}}, function(err, updatedUser){
+                    //                            account = updatedUser;
+                    //                        });
+                    //                }
+                    //                else{
+                    //                    foundProject.update({'resources.type': savedDonation.resources[i].type},
+                    //                        {'$inc': {'resources.$.inhand': donated}}, function(err, updatedProject){
+                    //                            project = updatedProject;
+                    //                        });
+                    //
+                    //                    foundUser.update({'resources.type': savedDonation.resources[i].type},
+                    //                        {'$dec': {'resources.$.quantity': donated}}, function(err, updatedUser){
+                    //                            account = updatedUser;
+                    //                        });
+                    //                }
+                    //            }
+                    //
+                    //            socket.broadcast.to(socketUsers[foundNotification.from.id]).emit('response-donation', {notification: updatedNotif, account: account, project: project});
+                    //            console.log('found Project: '+project.resources[0].inhand);
+                    //            console.log('found User: '+account.resources[1].quantity);
+                    //        });
+                    //    });
+                    //});
+
+                        //var projectUpdates = {};
+                        //var accountUpdates = {};
+                        //for(i = 0; i < savedDonation.resources.length; i++){
+                        //    var donated = parseInt(savedDonation.resources[i].donated);
+                        //    if(savedDonation.resources[i].description){
+                        //        project.update({_id: foundNotification.to.project.id, 'resources.type': savedDonation.resources[i].type, 'resources.description': savedDonation.resources[i].description},
+                        //            {'$inc': {'resources.$.inhand': donated}}, function(err, updatedProject){
+                        //                projectUpdates = updatedProject;
+                        //            });
+                        //
+                        //        user.update({_id: foundNotification.from.id, 'resources.type': savedDonation.resources[i].type, 'resources.description': savedDonation.resources[i].description},
+                        //            {'$dec': {'resources.$.quantity': donated}}, function(err, updatedUser){
+                        //                accountUpdates = updatedUser;
+                        //            });
+                        //    }
+                        //    else{
+                        //        project.update({'resources.type': savedDonation.resources[i].type},
+                        //            {'$inc': {_id: foundNotification.to.project.id, 'resources.$.inhand': donated}}, function(err, updatedProject){
+                        //                projectUpdates = updatedProject;
+                        //            });
+                        //
+                        //        user.update({_id: foundNotification.from.id, 'resources.type': savedDonation.resources[i].type},
+                        //            {'$dec': {'resources.$.quantity': donated}}, function(err, updatedUser){
+                        //                accountUpdates = updatedUser;
+                        //            });
+                        //    }
+                        //}
+                        //
+                        //socket.broadcast.to(socketUsers[foundNotification.from.id]).emit('response-donation', {notification: updatedNotif, account: accountUpdates, project: projectUpdates});
+                        //console.log('found Project: '+projectUpdates.resources[0].inhand);
+                        //console.log('found User: '+accountUpdates.resources[1].quantity);
+
+                    });
+                }
+                else{
+                    console.log('rejecting triggered');
+                    socket.broadcast.to(socketUsers[data.to._id]).emit('response-donation', {notification: updatedNotif});
+                    callback(updatedNotif);
+                }
+            });
+        });
+    });
+
+    socket.on('response-connection', function(data, callback){
+        notification.findOne({_id: data.notif._id}, function(err, foundNotification){
+            foundNotification.answer = data.response;
+            foundNotification.answered = true;
+            foundNotification.date = new Date();
+            foundNotification.seen = false;
+
+            foundNotification.save(function(err, updatedNotif){
+                if(err){
+                    return console.log('error: '+err);
+                }
+
+                if(data.response){
+                    user.findOne({_id: data.to.id}, function(err, foundUser){
+                        console.log('found connection response user:' + foundUser);
+                        foundUser.connections.push(data.account._id);
+                        foundUser.save(function(err, updatedUser){
+                            socket.broadcast.to(socketUsers[data.to.id]).emit('response-connection', {account: updatedUser, notification: updatedNotif});
+                        });
+
+                    });
+
+                    user.findOne({_id: data.account._id}, function(err, foundUser){
+                        foundUser.connections.push(data.to.id);
+                        foundUser.save(function(err, updatedUser){
+                            //callback(updatedUser);
+                            callback({account: updatedUser, notification: updatedNotif});
+                        });
+                    });
+                }
+                else{
+                    console.log('connection request rejected');
+                    socket.broadcast.to(socketUsers[data.to.id]).emit('response-connection', {notification: updatedNotif});
+                    callback({notification: updatedNotif});
+                }
+            });
+        });
+    });
+
+    socket.on('remove-connection', function(data, callback){
+
+        console.log('remove connection requested');
+
+        var notif = new notification();
+
+        notif.to = data.to;
+        notif.from = data.from;
+        notif.title = 'Connection Removed';
+        notif.type = 'RemoveConnection';
+        notif.content = "";
+        notif.answered = false;
+        notif.anwswer = false;
+
+        notif.save(function(err, savedNotif){
+            user.findOne({_id: data.to._id}, function(err, foundUser){
+                var index = foundUser.connections.indexOf(data.from._id);
+                foundUser.connections.splice(index, 1);
+                foundUser.save(function(err, updatedUser){
+                    socket.broadcast.to(socketUsers[data.to._id]).emit('remove-connection', {account: updatedUser, notification: savedNotif});
+                });
+            });
+
+            user.findOne({_id: data.from._id}, function(err, foundUser){
+                var index = foundUser.connections.indexOf(data.to._id);
+                foundUser.connections.splice(index, 1);
+                foundUser.save(function(err, updatedUser){
+                    callback(updatedUser);
+                    //callback({account: updatedUser);
+                });
+            });
+        });
+
+    });
+
+    socket.on('change-seen-notif', function(data){
+        data.forEach(function(notif){
+            notification.findOne({_id: notif._id}, function(err, foundNotif){
+                foundNotif.seen = true;
+                foundNotif.save(function(err, updatedNotif){
+
+                });
+            });
+        });
+    });
+
+    socket.on('change-seen-message', function(data){
+        data.forEach(function(message){
+            chatMessage.findOne({_id: message._id}, function(err, foundMessage){
+                foundMessage.seen = true;
+                foundMessage.save(function(err, updatedMessage){
+
+                });
+            });
+        });
+    });
+
+    socket.on('cancel-connection-request', function(data, callback){
+        var toId = data.to._id;
+        var fromId = data.from._id;
+        notification.findOne({'to.id': toId, 'from.id': fromId, type: 'AddConnection', answered: "false", cancelled: "false"}, function(err, foundNotif){
+            if(err){
+                return callback({status: false});
+            }
+
+            if(!foundNotif){
+                return callback({status: false});
+            }
+
+            foundNotif.cancelled = true;
+
+            foundNotif.save(function(err, updatedNotif){
+                if(err){
+                    return callback({status: false});
+                }
+
+                socket.broadcast.to(socketUsers[toId]).emit('cancel-connection-request', {notification: updatedNotif});
+                callback({status: true});
+            });
+        });
+    });
+
+    socket.on('cancel-collaboration-application-request', function(data, callback){
+        var toId = data.to._id;
+        var fromId = data.from._id;
+        var projectId = data.project._id;
+
+        notification.findOne({'to.id': toId, 'to.project.id': projectId, 'from.id': fromId, type: 'ApplyCollaboration', answered: "false", cancelled: "false"}, function(err, foundNotif){
+            if(err){
+                return callback({status: false});
+            }
+
+            if(!foundNotif){
+                return callback({status: false});
+            }
+
+            foundNotif.cancelled = true;
+
+            foundNotif.save(function(err, updatedNotif){
+                if(err){
+                    return callback({status: false});
+                }
+
+                socket.broadcast.to(socketUsers[toId]).emit('cancel-collaboration-application-request', {notification: updatedNotif});
+                callback({status: true});
+            });
+        });
+    });
+
+    socket.on('cancel-collaboration-invite-request', function(data, callback){
+        var toId = data.to._id;
+        var fromId = data.from._id;
+        var projectId = data.project._id;
+
+        notification.findOne({'to.id': toId, 'from.project.id': projectId, 'from.id': fromId, type: 'InviteCollaboration', answered: "false", cancelled: "false"}, function(err, foundNotif){
+            if(err){
+                return callback({status: false});
+            }
+
+            if(!foundNotif){
+                return callback({status: false});
+            }
+
+            foundNotif.cancelled = true;
+
+            foundNotif.save(function(err, updatedNotif){
+                if(err){
+                    return callback({status: false});
+                }
+
+                socket.broadcast.to(socketUsers[toId]).emit('cancel-collaboration-invite-request', {notification: updatedNotif});
+                callback({status: true});
+            });
+        });
+    });
+});
+
+
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

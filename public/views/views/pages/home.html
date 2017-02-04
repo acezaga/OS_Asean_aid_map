@@ -1,0 +1,472 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Home</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<toaster-container></toaster-container>
+
+<ng-map scrollwheel="false" zoom="3" center="[8.276727, 111.181641]">
+    <marker ng-repeat="project in projectLocations"
+            position="{{project.location}}"
+            on-click="onMarkerClick($position)"
+            title="{{project.count}} project(s) currently existing"
+            animation="DROP">
+    </marker>
+</ng-map>
+
+<!-- /.row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-primary" id="home-proj-list">
+            <div class="panel-heading">
+                <div class="input-group custom-search-form col-sm-6" id="searchbar">
+                    <input type="text" ng-model="asyncSelected" ng-change="findProject()" placeholder="Search..." uib-typeahead="project for project in searchedProjects | filter:$viewValue" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" data-toggle="dropdown">
+                            <i class="fa fa-filter"></i>
+                        </button>
+                            <ul class="dropdown-menu slidedown" id="filter-dropdown">
+                                <label class="col-sm-12">Filter Search by:</label>
+                                <li class="col-sm-12">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" value="Project" ng-model="searchChoice" checked>Project
+                                        </label>
+                                    </div>
+                                </li>
+                                <li class="col-sm-12">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" value="Organization" ng-model="searchChoice">Organization
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
+                        <button ng-click="executeSearch()" class="btn btn-default" type="button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <br/>
+                    </span>
+                </div>
+                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                <div ng-show="noResults">
+                    <i class="glyphicon glyphicon-remove"></i> No Results Found
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <!--<div class="col-xs-12">-->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <!--<div class="box">-->
+                                <div class="box-content">
+                                    <div class="col-lg-11">
+                                        <h3 class="page-header" ng-if="!clickMarkerLoc"> Projects
+                                            <!--<div class="btn-group">-->
+                                                <!--<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">-->
+                                                    <!--<i class="fa fa-filter"></i>-->
+                                                <!--</button>-->
+                                                <!--<div class="dropdown-menu">-->
+                                                    <!--<a href="#" value="title"><i class="fa fa-folder-open"></i></a>-->
+                                                    <!--<a href="#" value="orgname"><i class="fa fa-credit-card"></i></a>-->
+                                                    <!--<a href="#" value="desc"><i class="fa fa-ticket"></i></a>-->
+                                                    <!--<a href="#"><i class="fa fa-bookmark-o"></i></a>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        </h3>
+                                        <h3 class="page-header" ng-if="clickMarkerLoc">{{projects.length}} project(s) in {{clickMarkerLoc}}</h3>
+                                    </div>
+                                    <div class="projectSection col-lg-11">
+                                        <ul class="projectlist">
+                                            <li ng-repeat="project in pagedProjects | orderBy: 'startDate':true">
+                                                <div class="project">
+                                                    <div class="title">
+                                                        <div class="project-avatar pull-left">
+                                                            <img class="img-circle" data-ng-src="{{ project.picture ? 'data:image/png;base64,'+project.picture :  'images/def-proj2.jpg'}}" data-err-src="images/def-proj2.jpg"/>
+                                                        </div>
+                                                        <h2 class="projecttitle"><a href="" ng-click="onClickProjectName(project)">{{ project.title}}</a></h2>
+                                                        <div class="organization">
+                                                            <p> Conducted by: <a href="" ng-click="onClickOrgName(project.creator)">{{ project.creator.orgname }}</a></p>
+                                                            <div class="desc">
+                                                                {{project.description}}
+                                                            </div><!-- desc -->
+                                                        </div><!-- organization -->
+                                                    </div><!-- title -->
+                                                </div><!-- project -->
+                                                <hr/>
+                                            </li>
+                                        </ul>
+                                        <p></p><br/>
+                                        <p></p>
+
+                                    </div>
+                                    <!--</div>-->
+                                </div>
+                                <div class="pull-center">
+                                    <ul uib-pagination total-items="projects.length" ng-model="currentPage" items-per-page="5" max-size="maxSize" class="pagination-md" boundary-link-numbers="true" rotate="false"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!--</div>-->
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="box">
+                                        <div class="box-content">
+                                            <div class="row" ng-show="authentication">
+                                                <form role="form">
+                                                    <h3 class="page-header">Suggestions
+                                                        <div class="btn-group form-group">
+                                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                <i class="fa fa-chevron-down"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu slidedown" id="suggestion-dropdown">
+                                                                <li class="col-sm-12">
+                                                                    <button ng-click="refreshSuggestionFilter()" class="btn btn-link pull-right"><i class="fa fa-refresh"></i></button>
+                                                                    <!--<a>-->
+                                                                    <label>
+                                                                        <input type="checkbox" ng-model="countryPick"> Country
+                                                                    </label>
+                                                                    <!--</a>-->
+                                                                </li>
+                                                                <li class="col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <select ng-options="country for country in countries" ng-model="countryCriteria" ng-disabled="!countryPick" ng-change="getSuggestedProjects()" class="form-control">
+
+                                                                        </select>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="col-sm-12">
+                                                                    <!--<a>-->
+                                                                    <label>
+                                                                        <input type="checkbox" ng-model="sectorPick"> Sector
+                                                                    </label>
+                                                                    <!--</a>-->
+                                                                </li>
+                                                                <li class="col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <select ng-options="sector for sector in sectors" ng-model="sectorCriteria" ng-disabled="!sectorPick" ng-change="getSuggestedProjects()" class="form-control">
+
+                                                                        </select>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="col-sm-12">
+                                                                    <!--<a>-->
+                                                                    <label>
+                                                                        <input type="checkbox" ng-model="resourcesPick"> Resources
+                                                                    </label>
+                                                                    <!--</a>-->
+                                                                </li>
+                                                                <li class="col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <select ng-options="resource for resource in resources" ng-model="resourcesCriteria" ng-disabled="!resourcesPick" ng-change="getSuggestedProjects()" class="form-control">
+
+                                                                        </select>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </h3>
+                                                </form>
+                                            </div>
+                                            <div ng-if="suggestedProjects.length < 1 && authentication">
+                                                <span class="help-block">No suggestions generated. To generate your own suggestions, click the dropdown button.</span>
+                                            </div>
+                                            <div ng-if="!checkIfProfileComplete() && authentication">
+                                                <span class="help-block">Complete your profile to get project suggestions. Go to <a href="" ng-click="">your profile</a>. </span>
+                                            </div>
+                                            <ul class="suggestionlist" ng-show="authentication">
+                                                <!--<li ng-repeat="project in suggestedProjects | limitTo:4 track by $index">-->
+                                                <!--<div>-->
+                                                <!--<span><button class="btn btn-link pull-right"><i class="fa fa-times"></i></button></span>-->
+                                                <!--<span uib-popover-html="htmlPopover" data-html="true" popover-placement="left" popover-trigger="'mouseenter'" class="btn btn-link" class="projecttitle">{{ project.title}}</span>-->
+                                                <!--<div class="organization">-->
+                                                <!--by <a>{{project.creator.orgname}}</a>-->
+                                                <!--</div>-->
+                                                <!--</div>-->
+                                                <!--</li>-->
+                                                <li>
+                                                    <div ng-show="suggestedProjects.length > 0">
+                                                        <div id="container1">
+                                                            <span><button ng-click="removeSuggestion(0)" class="btn btn-link pull-right"><i class="fa fa-times"></i></button></span>
+                                                            <span class="projecttitle"><a ng-click="onClickSuggestedProject(suggestedProjects[0])" ng-mouseenter="checkCollabStats(account._id, suggestedProjects[0]._id)" class="btn pop" popover data-popover-content="#suggestedProject1" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="focus">{{suggestedProjects[0].title}}</a></span>
+                                                            <div id="suggestedProject1" class="hidden">
+                                                                <!--<div class="popover-heading">This is the heading for #2</div>-->
+                                                                <div class="popover-body">
+                                                                    <label>Matched Resources</label>
+                                                                    <div>
+                                                                        <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                                                            <span ng-if="(resource.description)">{{resource.type}}({{resource.description}}): needs {{resource.needed | number:0}}</span>
+                                                                            <span ng-if="(!resource.description)">{{resource.type}}: needs {{resource.needed | number:0}}</span>
+                                                                        </div>
+
+                                                                        <!--<div class="pop-suggest-text">-->
+                                                                            <!--<span>ResourceName: project needs #ofneed</span>-->
+                                                                        <!--</div>-->
+                                                                    </div>
+                                                                    <br/>
+                                                                    <label>Proximity</label>
+                                                                    <div class="pop-suggest-text">
+                                                                        <span>Location: {{suggestedProjects[0].address.city}},{{suggestedProjects[0].address.country}}</span><br/>
+                                                                        <span>{{matchedConnCollab}} connection(s) are collaborating in this project</span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Matched sectors</label>
+                                                                        <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Time Frame: </label>
+                                                                        <span class="pop-suggest-text">Project started {{currentStatistic.date}} day(s) ago</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="organization">
+                                                                by <a href="" ng-click="onClickSuggestedAccount(suggestedProjects[0].creator)">{{suggestedProjects[0].creator.orgname}}</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-show="suggestedProjects.length > 1">
+                                                        <div id="container2">
+                                                            <span><button ng-click="removeSuggestion(1)" class="btn btn-link pull-right"><i class="fa fa-times"></i></button></span>
+                                                            <span class="projecttitle"><a ng-click="onClickSuggestedProject(suggestedProjects[1])" ng-mouseenter="checkCollabStats(account._id, suggestedProjects[1]._id)" class="btn pop" data-popover-content="#suggestedProject2" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">{{suggestedProjects[1].title}}</a></span>
+                                                            <div id="suggestedProject2" class="hidden">
+                                                                <!--<div class="popover-heading">This is the heading for #2</div>-->
+                                                                <div class="popover-body">
+                                                                    <label>Matched Resources</label>
+                                                                    <div>
+                                                                        <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                                                            <span ng-if="(resource.description)">{{resource.type}}({{resource.description}}): needs {{resource.needed | number:0}}</span>
+                                                                            <span ng-if="(!resource.description)">{{resource.type}}: needs {{resource.needed | number:0}}</span>
+                                                                        </div>
+                                                                        <!--<div class="pop-suggest-text">-->
+                                                                        <!--<span>ResourceName: project needs #ofneed</span>-->
+                                                                        <!--</div>-->
+                                                                    </div>
+                                                                    <br/>
+                                                                    <label>Proximity</label>
+                                                                    <div class="pop-suggest-text">
+                                                                        <span>Location: {{suggestedProjects[1].address.city}},{{suggestedProjects[1].address.country}}</span><br/>
+                                                                        <span>{{matchedConnCollab}} ofconnections connection(s) are collaborating in this project</span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Matched sectors</label>
+                                                                        <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Time Frame: </label>
+                                                                        <span class="pop-suggest-text">Project started {{currentStatistic.date}} day(s) ago</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="organization">
+                                                                by <a href="" ng-click="onClickSuggestedAccount(suggestedProjects[1].creator)">{{suggestedProjects[1].creator.orgname}}</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-show="suggestedProjects.length > 2">
+                                                        <div id="container3">
+                                                            <span><button ng-click="removeSuggestion(2)" class="btn btn-link pull-right"><i class="fa fa-times"></i></button></span>
+                                                            <span class="projecttitle"><a ng-click="onClickSuggestedProject(suggestedProjects[2])" ng-mouseenter="checkCollabStats(account._id, suggestedProjects[2]._id)" class="btn pop" data-popover-content="#suggestedProject3" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">{{suggestedProjects[2].title}}</a></span>
+                                                            <div id="suggestedProject3" class="hidden">
+                                                                <!--<div class="popover-heading">This is the heading for #2</div>-->
+                                                                <div class="popover-body">
+                                                                    <label>Matched Resources</label>
+                                                                    <div>
+                                                                        <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                                                            <span ng-if="(resource.description)">{{resource.type}}({{resource.description}}): needs {{resource.needed | number:0}}</span>
+                                                                            <span ng-if="(!resource.description)">{{resource.type}}: needs {{resource.needed | number:0}}</span>
+                                                                        </div>
+                                                                        <!--<div class="pop-suggest-text">-->
+                                                                        <!--<span>ResourceName: project needs #ofneed</span>-->
+                                                                        <!--</div>-->
+                                                                    </div>
+                                                                    <br/>
+                                                                    <label>Proximity</label>
+                                                                    <div class="pop-suggest-text">
+                                                                        <span>Location: {{suggestedProjects[2].address.city}},{{suggestedProjects[2].address.country}}</span><br/>
+                                                                        <span>{{matchedConnCollab}} ofconnections connection(s) are collaborating in this project</span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Matched sectors</label>
+                                                                        <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Time Frame: </label>
+                                                                        <span class="pop-suggest-text">Project started {{currentStatistic.date}} day(s) ago</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="organization">
+                                                                by <a href="" ng-click="onClickSuggestedAccount(suggestedProjects[2].creator)">{{suggestedProjects[2].creator.orgname}}</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-show="suggestedProject.length > 3">
+                                                        <div id="container4">
+                                                            <span><button ng-click="removeSuggestion(3)" class="btn btn-link pull-right"><i class="fa fa-times"></i></button></span>
+                                                            <span class="projecttitle"><a ng-click="onClickSuggestedProject(suggestedProjects[3])" ng-mouseenter="checkCollabStats(account._id, suggestedProjects[3]._id)" class="btn pop" data-popover-content="#suggestedProject4" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">{{suggestedProjects[3].title}}</a></span>
+                                                            <div id="suggestedProject4" class="hidden">
+                                                                <!--<div class="popover-heading">This is the heading for #2</div>-->
+                                                                <div class="popover-body">
+                                                                    <label>Matched Resources</label>
+                                                                    <div>
+                                                                        <div class="pop-suggest-text" ng-repeat="resource in matchedResources track by $index">
+                                                                            <span ng-if="(resource.description)">{{resource.type}}({{resource.description}}): needs {{resource.needed | number:0}}</span>
+                                                                            <span ng-if="(!resource.description)">{{resource.type}}: needs {{resource.needed | number:0}}</span>
+                                                                        </div>
+                                                                        <!--<div class="pop-suggest-text">-->
+                                                                        <!--<span>ResourceName: project needs #ofneed</span>-->
+                                                                        <!--</div>-->
+                                                                    </div>
+                                                                    <br/>
+                                                                    <label>Proximity</label>
+                                                                    <div class="pop-suggest-text">
+                                                                        <span>Location: {{suggestedProjects[3].address.city}},{{suggestedProjects[3].address.country}}</span><br/>
+                                                                        <span>{{matchedConnCollab}} ofconnections connection(s) are collaborating in this project</span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Matched sectors</label>
+                                                                        <span class="help-block pop-suggest-text"><button class="btn btn-link" ng-repeat="sector in currentStatistic.matchedSector track by $index">{{sector}}</button> </span>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div>
+                                                                        <label>Time Frame: </label>
+                                                                        <span class="pop-suggest-text">Project started {{currentStatistic.date}} day(s) ago</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="organization">
+                                                                by <a href="" ng-click="onClickSuggestedAccount(suggestedProjects[3].creator)">{{suggestedProjects[3].creator.orgname}}</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+
+                                            <h3 class="page-header">Sectors</h3>
+                                            <div class="box-content">
+                                                <div id="healthsec">
+                                                    <a class="btn pop" data-popover-content="#health" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover"><span class="sec-name"><i class="fa fa-medkit"></i>&nbsp;
+                                                        Health & Nutrition</span></a>
+                                                    <uib-progressbar value="(health.size/projects.length*100)" type="info"><b>{{(health.size/projects.length*100) | number:2}}%</b></uib-progressbar>
+                                                    <!--popoverbody-->
+                                                    <div id="health" class="hidden">
+                                                        <div class="popover-heading">Number of projects in sub-sectors</div>
+                                                        <div class="popover-body">
+                                                            <div ng-repeat="subsec in health.subsectors">
+                                                                <label>{{subsec.name}}</label>
+                                                                <div>
+                                                                    <span>Number of projects: {{subsec.count}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--popoverbody end-->
+                                                </div>
+                                                <div id="educsec">
+                                                    <a class="btn pop" data-popover-content="#educ" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">
+                                                        <span class="sec-name"><i class="fa fa-graduation-cap"></i>&nbsp;Education</span>
+                                                    </a>
+                                                    <uib-progressbar value="(poverty.size/projects.length*100)" type="info"><b>{{(poverty.size/projects.length*100) | number:2}}%</b></uib-progressbar>
+                                                    <!--popoverbody-->
+                                                    <div id="educ" class="hidden">
+                                                        <div class="popover-heading">Number of projects in sub-sectors</div>
+                                                        <div class="popover-body">
+                                                            <div ng-repeat="subsec in poverty.subsectors">
+                                                                <label>{{subsec.name}}</label>
+                                                                <div>
+                                                                    <span>Number of projects: {{subsec.count}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--popoverbody end-->
+                                                </div>
+                                                <div id="povsec">
+                                                    <a class="btn pop" data-popover-content="#pov" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">
+                                                        <span class="sec-name"><i class="fa fa-home"></i>&nbsp;Poverty Eradication</span>
+                                                    </a>
+                                                    <uib-progressbar value="(rural.size/projects.length*100)" type="info"><b>{{(rural.size/projects.length*100) | number:2}}%</b></uib-progressbar>
+                                                    <!--popoverbody-->
+                                                    <div id="pov" class="hidden">
+                                                        <div class="popover-heading">Number of projects in sub-sectors</div>
+                                                        <div class="popover-body">
+                                                            <div ng-repeat="subsec in rural.subsectors">
+                                                                <label>{{subsec.name}}</label>
+                                                                <div>
+                                                                    <span>Number of projects: {{subsec.count}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--popoverbody end-->
+                                                </div>
+                                                <div id="ruralsec">
+                                                    <a class="btn pop" data-popover-content="#rural" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">
+                                                        <span class="sec-name"><i class="fa fa-building"></i>&nbsp;Rural Development</span>
+                                                    </a>
+                                                    <uib-progressbar value="(education.size/projects.length*100)" type="info"><b>{{(education.size/projects.length*100) | number:2}}%</b></uib-progressbar>
+                                                    <!--popoverbody-->
+                                                    <div id="rural" class="hidden">
+                                                        <div class="popover-heading">Number of projects in sub-sectors</div>
+                                                        <div class="popover-body">
+                                                            <div ng-repeat="subsec in education.subsectors">
+                                                                <label>{{subsec.name}}</label>
+                                                                <div>
+                                                                    <span>Number of projects: {{subsec.count}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--popoverbody end-->
+                                                </div>
+                                                <div id="envsec">
+                                                    <a class="btn pop" data-popover-content="#envi" data-popover="true" type="button" data-toggle="popover" data-placement="left" data-html="true" data-trigger="hover">
+                                                        <span class="sec-name"><i class="fa fa-shopping-basket"></i>&nbsp;Environment</span>
+                                                    </a>
+                                                    <uib-progressbar value="(environment.size/projects.length*100)" type="info"><b>{{(environment.size/projects.length*100) | number:2}}%</b></uib-progressbar>
+                                                    <!--popoverbody-->
+                                                    <div id="envi" class="hidden">
+                                                        <div class="popover-heading">Number of projects in sub-sectors</div>
+                                                        <div class="popover-body">
+                                                            <div ng-repeat="subsec in environment.subsectors">
+                                                                <label>{{subsec.name}}</label>
+                                                                <div>
+                                                                    <span>Number of projects: {{subsec.count}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--popoverbody end-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row (nested) -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-12 -->
+</div>

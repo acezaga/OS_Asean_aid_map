@@ -1,0 +1,60 @@
+<div ng-controller="sidebarController" class="navbar-default sidebar" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+        <ul class="nav in" id="side-menu">
+            <li ui-sref-active="active">
+                <a ui-sref="dashboard.home"><i class="fa fa-home fa-fw"></i> Home</a>
+            </li>
+            <li ui-sref-active="active" ng-if="authentication">
+                <a ui-sref="dashboard.inbox"><i class="fa fa-inbox fa-fw"></i> Messaging</a>
+            </li>
+            <li ng-if="authentication" ng-class="{active: collapseVar==1}">{{dropDown}}
+                <a href="" ng-click="check(1)"><i class="fa fa-archive fa-fw"></i> Project Promotion Management<span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level" uib-collapse="collapseVar!=1">
+                    <li ui-sref-active="active">
+                        <a ui-sref="dashboard.createproject">Create Project</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="dashboard.projectlist">Project List</a>
+                    </li>
+                </ul>
+                <!-- /.nav-second-level -->
+            </li>
+            <li ng-if="authentication" ng-class="{active: collapseVar==2}">
+                <a href="" ng-click="check(2)"><i class="fa fa-th-list fa-fw"></i> Reports <span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level" uib-collapse="collapseVar!=2">
+                    <li>
+                        <a ui-sref="dashboard.summaryreport">Summary</a>
+                    </li>
+                    <li ng-init="third=!third" ng-class="{active: multiCollapseVar==3}">
+                        <a href="" ng-click="multiCheck(3)">Statistics <span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level" uib-collapse="multiCollapseVar!=3">
+                            <li>
+                                <a ui-sref="dashboard.frequencyreport">Project Frequency</a>
+                            </li>
+                            <li>
+                                <a ui-sref="dashboard.projectstatus">Project Status Statistics</a>
+                            </li>
+                            <li>
+                                <a ui-sref="dashboard.performanceStatistics">Performance Statistics</a>
+                            </li>
+                            <li>
+                                <a ui-sref="dashboard.resourcestat">Resource Statistics</a>
+                            </li>
+                        </ul>
+                        <!-- /.nav-third-level -->
+                    </li>
+                </ul>
+                <!-- /.nav-second-level -->
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="dashboard.faqs"><i class="fa fa-question-circle fa-fw"></i> FAQs</a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="dashboard.credits"><i class="fa fa-dashboard fa-fw"></i> Credits</a>
+            </li>
+        </ul>
+    </div>
+    <!-- /.sidebar-collapse -->
+</div>

@@ -1,0 +1,205 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Edit Project</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<div class="row">
+    <form role="form">
+    <div class="col-lg-12">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Project/Program Title:</label>
+                            <input type="text" class="form-control" ng-model="project.title">
+                        </div>
+                        <div class="form-group">
+                            <label>Project Address:</label>
+                            <div class="form-group">
+                                <label class="col-lg-2">Country:</label>
+                                <div class="col-lg-4">
+                                    <select id="country" class="form-control" ng-model="project.address.country" ng-options="country for (country, city) in countries"
+                                            ng-change="GetSelectedCountry()">
+                                        <option>Select a Country</option>
+                                        <!--<option>Brunei Darussalam</option>-->
+                                        <!--<option>Cambodia</option>-->
+                                        <!--<option>Indonesia</option>-->
+                                        <!--<option>Lao PDR</option>-->
+                                        <!--<option>Malaysia</option>-->
+                                        <!--<option>Myanmar</option>-->
+                                        <!--<option>Philippines</option>-->
+                                        <!--<option>Singapore</option>-->
+                                        <!--<option>Thailand</option>-->
+                                        <!--<option>Vietnam</option>-->
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <!--<div class="form-group">-->
+                                <!--<label class="col-lg-2">Province: </label>-->
+                                <!--<div class="col-lg-4">-->
+                                    <!--<select id="state" ng-disabled="!project.address.country" ng-model="project.address.province" class="form-control" ng-options="state for (state,city) in project.address.country" ng-change="GetSelectedState()">-->
+                                        <!--<option value=''>Select a Province</option>-->
+                                    <!--</select>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<br/>-->
+                            <!--<br/>-->
+                            <div class="form-group">
+                                <label class="col-lg-2">City/State: </label>
+                                <div class="col-lg-4">
+                                    <select id="city" ng-disabled="!project.address.country" class="form-control" ng-model="project.address.city">
+                                        <option value="">Please Select a City</option>
+                                        <option ng-repeat="city in project.address.country" value="{{city}}">{{city}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <label class="col-lg-2">Street: </label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" ng-model="project.address.street">
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div class="form-group">
+                            <label class="col-lg-3">Start Date: </label>
+                            <div class="col-lg-3">
+                                <input type="text" class="form-control" uib-datepicker-popup="{{dateFormat}}" ng-click="openDatePicker(1)" ng-model="project.startDate" is-open="datepickerPopup1.opened" datepicker-options="dateOptions1" ng-required="true" close-text="Close" />
+                            </div>
+                            <label class="col-lg-3">End Date: </label>
+                            <div class="col-lg-3">
+                                <input type="text" class="form-control" uib-datepicker-popup="{{dateFormat}}" ng-click="openDatePicker(2)" ng-model="project.endDate" is-open="datepickerPopup2.opened" datepicker-options="dateOptions2" ng-required="true" close-text="Close" />
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <div class="form-group">
+                            <label>Budget:</label> <br/>
+                            <div class="col-lg-5">
+                                <input type="text" class="form-control" cols="4" ng-model="project.budget">
+                                <div><input type="checkbox">&nbsp;Show</div>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <div class="form-group">
+                            <label>Collaborator(s):</label>
+                            <input class="form-control" ng-model="project.Collaborator">
+                        </div>
+                            <label>Needed Resources:</label>
+                            <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('resource')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="form-group input-group" ng-repeat="res in resourceSet.resource track by $index">
+                                <div class="col-lg-5">
+                                    <select class="form-control" name="sector" ng-model="res.type" ng-options="resource for resource in resourcesTypes" >
+                                        <span class="input-group-addon"><a href="#">+</a></span>
+                                        <option value hidden>Select a Resource</option>
+                                    </select>
+                                </div>
+                                <div ng-if="activateField(res.type, 'DescQty')">
+                                    <div ng-if="activateField(res.type, 'Desc')">
+                                        <div class="col-lg-5">
+                                            <input type="text" class="form-control" ng-model="res.description" placeholder="description">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <input type="text" class="form-control" ng-model="res.quantity" placeholder="qty">
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+                <div class="col-lg-6">
+                        <label>Status:</label>
+                    <div class="form-group">
+                        <div class="col-lg-4">
+                            <select class="form-control" ng-model="project.status">
+                                <option>Ongoing</option>
+                                <option>On-hold</option>
+                                <option>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br/>
+                    <label>Description:</label>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" ng-model="project.description"></textarea>
+                    </div>
+                    <label>Contact Information</label>
+                    <div class="form-group">
+                        <p class="col-lg-2">Email</p>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" ng-model="project.contacts.email">
+                        </div>
+                        <p class="col-lg-2">Tel No.</p>
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" ng-model="project.contacts.telNo">
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div class="form-group">
+                        <p class="col-lg-2">Website</p>
+                        <div class="col-lg-4">
+                            <input type="url" class="form-control" ng-model="project.contacts.website">
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div class="form-group">
+                        <label>Sector</label>
+                        <div class="form-group">
+                                <span class="input-group-btn">
+                                    <button ng-click="addNewField('sector')" class="btn btn-default" type="button"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        <div class="form-group" ng-repeat="sec in sectorSet.sectors track by $index">
+                            <select class="form-control input-group" ng-model="sec.type" ng-options="sector for sector in sectorTypes">
+                                <option value hidden>Select a Sector</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2">Add Media:</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-4">
+                                <label></label>
+                                <input type="file">
+                            </div>
+                            <div class="col-lg-4">
+                                <span>Add video link:</span>
+                                <div>
+                                    <input class="form-control" type="url">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-6 (nested) -->
+
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6"></div>
+                <button class="btn btn-primary">&nbsp;&nbsp; Cancel &nbsp; &nbsp;</button>
+                <button ng-click="createNewProject()" class="btn btn-primary">Save Changes</button>
+            </div>
+
+            <!-- /.row (nested) -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    </form>
+    <!-- /.col-lg-12 -->
+</div>

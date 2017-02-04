@@ -1,0 +1,231 @@
+<div class="container-fluid" ng-init="retrieveContacts()">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Messaging</h1>
+        </div>
+        <div class="col-lg-12">
+            <p class="help-block">Discuss about your current project with your collaborators, or future joint projects with your connections.</p>
+        </div>
+        <div>
+            <span class="pull-right"><a class="text-center btn btn-link" data-toggle="modal" data-target="#createMessage"><button type="button" class="btn btn-outline btn-primary btn-sm"><i class="fa fa-plus"></i> &nbsp; Create New Message</button></a></span>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <br/>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="panel panel-default chatlist">
+                <div class="panel-heading">
+                    Message List
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <div class="list-group-item" ng-repeat="connac in connectedAccounts track by $index">
+                            <!--<li>-->
+                                <a href="" class="list-group-item" ng-click="getSelectedRecipient(connac, 'private')">
+                                    <i class="fa fa-inbox fa-fw"></i>{{connac.orgname}}</a>
+                            <!--</li>-->
+                        </div>
+                    <!--</div>-->
+                    <!--<div class="inboxlist">-->
+                        <div class="list-group-item" ng-repeat="project in collaboratedProjects track by $index">
+                            <!--<li>-->
+                                <!--<a href="" ng-click="getSelectedRecipient(project, 'group')"><i class="fa fa-inbox fa-fw"></i>{{project.title}}</a>-->
+                            <!--</li>-->
+                            <!--<div class="list-group">-->
+                                <a href="" ng-click="getSelectedRecipient(project, 'group')">
+                                    <i class="fa fa-inbox fa-fw"></i>{{project.title}}
+                                    <!--<span class="pull-right text-muted small"><em>4 minutes ago</em>
+                                    </span>-->
+                                </a>
+                            <!--</div>-->
+                            <!-- /.list-group -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="chat-panel panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-comments fa-fw"></i>
+                    <span ng-if="currentContact.type == 'private'">
+                        {{currentContact.orgname}}
+                    </span>
+                    <span ng-if="currentContact.type == 'group'">
+                        {{currentContact.title}}
+                    </span>
+                    <!--<div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu slidedown">
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-refresh fa-fw"></i> Refresh
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-check-circle fa-fw"></i> Available
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-times fa-fw"></i> Busy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-clock-o fa-fw"></i> Away
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="#">
+                                    <i class="fa fa-sign-out fa-fw"></i> Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>-->
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row">
+                        <p class="help-block" style="text-align: center"><i class="fa fa-warning fa-fw"></i>Relevant messages only. AVOID SPAMMING.</p>
+                    </div>
+                    <ul class="chat">
+                        <div ng-repeat="chatmessage in messages track by $index">
+                            <li class="left clearfix" ng-if="chatmessage.from.id != account._id">
+                                <span class="chat-img pull-left">
+                                    <img src="http://placehold.it/50/55C1E7/fff" alt="User Avatar" class="img-circle">
+                                </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <strong class="primary-font">{{chatmessage.from.name}}</strong>
+                                        <small class="pull-right text-muted">
+                                            <i class="fa fa-clock-o fa-fw"></i> {{chatmessage.dateCreated | date: 'medium'}}
+                                        </small>
+                                    </div>
+                                    <p class="pull-left">
+                                        {{chatmessage.message}}
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="right clearfix" ng-if="chatmessage.from.id == account._id">
+                                <span class="chat-img pull-right">
+                                    <img src="http://placehold.it/50/FA6F57/fff" alt="User Avatar" class="img-circle">
+                                </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <small class=" text-muted">
+                                            <i class="fa fa-clock-o fa-fw"></i> {{chatmessage.dateCreated | date: 'medium'}}</small>
+                                        <strong class="pull-right primary-font">{{chatmessage.from.name}}</strong>
+                                    </div>
+                                    <p class="pull-right">
+                                        {{chatmessage.message}}
+                                    </p>
+                                </div>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+                <!-- /.panel-body -->
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input ng-model="message.content" id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here...">
+            <span class="input-group-btn">
+                <button ng-click="replyMessage()" class="btn btn-warning btn-sm" id="btn-chat">
+                    Send
+                </button>
+            </span>
+                    </div>
+                </div>
+                <!-- /.panel-footer -->
+            </div>
+        </div>
+    </div>
+    <!-- CREATE MESSAGE Modal -->
+    <form role="form" novalidate ng-submit="submit()">
+        <div class="modal fade" id="createMessage" tabindex="2" role="dialog" aria-labelledby="messageBox" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="messageBox">Create Message</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label>To</label>
+                        <div class="form-group input-group">
+                            <!--<tags-input ng-model="tags" add-on-enter="false" add-on-space="false" add-on-comma="false" placeholder="Add recipient"></tags-input>-->
+                            <tags-input ng-model="tags" placeholder="Add recipient"></tags-input>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" data-toggle="modal" data-target="#contactList"><i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input ng-model="message.subject" class="form-control" placeholder="Subject here..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea ng-model="message.content" class="form-control" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline btn-primary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" ng-click="sendNewMessage()">Send</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    </form>
+    <!-- /.modal -->
+    <!-- INVITE List Modal -->
+    <div ng-init="retrieveContacts()" class="modal fade" id="contactList" tabindex="-1" role="dialog" aria-labelledby="conList" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="conList">Contacts</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group input-group">
+                        <input type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                    </div>
+                    <label>Connections</label>
+                    <ul class="connectionlist">
+                        <!--<div>-->
+                        <div ng-repeat="conn in connectedAccounts track by $index">
+                            <li><button type="button" class="btn btn-link">{{conn.orgname}}</button><span><button type="button" class="btn btn-outline btn-default btn-xs" ng-click="addRecipient(conn)"><i class="fa fa-plus"></i></button></span></li>
+                        </div>
+                        <!--</div>-->
+                        <!--<li><button type="button" class="btn btn-link">Connected Org 1</button><span><button type="button" class="btn btn-outline btn-default btn-xs" ng-click="addRecipient('connected')"><i class="fa fa-plus"></i></button></span></li>-->
+                        <!--<li><button type="button" class="btn btn-link">Connected Org 2</button><span><button type="button" class="btn btn-outline btn-default btn-xs"><i class="fa fa-plus"></i></button></span></li>-->
+                    </ul>
+                    <label>Groups</label>
+                    <ul class="connectionlist">
+                        <!--<div>-->
+                        <div ng-repeat="collab in collaboratedProjects track by $index">
+                            <li><button type="button" class="btn btn-link">{{collab.title}}</button><span><button type="button" class="btn btn-outline btn-default btn-xs" ng-click="addGroup(collab)"><i class="fa fa-plus"></i></button></span></li>
+                        </div>
+                        <!--</div>-->
+                        <!--<li><button type="button" class="btn btn-link">Connected Org 1</button><span><button type="button" class="btn btn-outline btn-default btn-xs" ng-click="addRecipient('connected')"><i class="fa fa-plus"></i></button></span></li>-->
+                        <!--<li><button type="button" class="btn btn-link">Connected Org 2</button><span><button type="button" class="btn btn-outline btn-default btn-xs"><i class="fa fa-plus"></i></button></span></li>-->
+                    </ul>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>

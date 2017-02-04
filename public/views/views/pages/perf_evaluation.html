@@ -1,0 +1,299 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Performance Evaluation</h1>
+           <p>Evaluate<button class="btn btn-link" type="button">"{{project.creator.orgname}}"</button> performance based on your collaboration on<button class="btn btn-link">{{project.title}}</button>.</p>
+           <p class="help-block">Note: This evaluation will reflect on the organization's performance rate. Please evaluate honestly.</p>
+
+        <toaster-container></toaster-container>
+
+        <!-- /.panel -->
+        <form>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                &nbsp;
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <div class="Table">
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Effort exerted of the head organization to the project.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.effort" ng-value="0" name="e1" id="notSatisfied1" value="NotSatisfied">Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.effort" ng-value="5" name="e1" id="poorlySatisfied1" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.effort" ng-value="10" name="e1" id="satisfied1" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.effort" ng-value="20" name="e1" id="verySatisfied1" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Appeal to potential collaborators and donors.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.appeal" ng-value="0" name="e2" id="notSatisfied2" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.appeal" ng-value="3" name="e2" id="poorlySatisfied2" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.appeal" ng-value="5" name="e2" id="satisfied2" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.appeal" ng-value="10" name="e2" id="verySatisfied2" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Purpose or advocacy of the project.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.purpose" ng-value="0" name="e3" id="notSatisfied3" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.purpose" ng-value="3" name="e3" id="poorlySatisfied3" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.purpose" ng-value="5" name="e3" id="satisfied3" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.purpose" ng-value="10" name="e3" id="verySatisfied3" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Display of resources utilization to the summary of project.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.display" ng-value="0" name="e4" id="notSatisfied4" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.display" ng-value="4" name="e4" id="poorlySatisfied4" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.display" ng-value="7" name="e4" id="satisfied4" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.display" ng-value="15" name="e4" id="verySatisfied4" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Utilization of resources (allocation of resources).</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.utilization" ng-value="0" name="e5" id="notSatisfied5" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.utilization" ng-value="3" name="e5" id="poorlySatisfied5" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.utilization" ng-value="5" name="e5" id="satisfied5" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.utilization" ng-value="10" name="e5" id="verySatisfied5" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Time allotment for the project scope.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.time" ng-value="0" name="e6" id="notSatisfied6" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.time" ng-value="3" name="e6" id="poorlySatisfied6" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.time" ng-value="5" name="e6" id="satisfied6" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.time" ng-value="10" name="e6" id="verySatisfied6" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Quantity of media provided (photos, videos, etc.).</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Qmedia" ng-value="0" name="e7" id="notSatisfied7" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Qmedia" ng-value="3" name="e7" id="poorlySatisfied7" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Qmedia" ng-value="5" name="e7" id="satisfied7" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Qmedia" ng-value="10" name="e7" id="verySatisfied7" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="Row">
+                            <div class="Cell">
+                                <p>Relevance of media provided to the project.</p>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Rmedia" ng-value="0" name="e8" id="notSatisfied8" value="NotSatisfied" checked>Not Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Rmedia" ng-value="4" name="e8" id="poorlySatisfied8" value="PoorlySatisfied" checked>Poorly Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Rmedia" ng-value="7" name="e8" id="satisfied8" value="option1" checked>Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="Cell">
+                                <div class="radio-inline">
+                                    <label>
+                                        <input type="radio" ng-model="performanceReport.evaluation.Rmedia" ng-value="15" name="e8" id="verySatisfied8" value="option1" checked>Very Satisfied
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.table-responsive -->
+                    <br/>
+                    <div class="form-group">
+                        <div class="col-lg-6"></div>
+                        <button class="btn btn-primary">&nbsp;&nbsp; Cancel &nbsp; &nbsp;</button>
+                        &nbsp;
+                        &nbsp;
+                        <button ng-click="submitReport()" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
