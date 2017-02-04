@@ -20,7 +20,10 @@ if (process.env.OPENSHIFT_MONGODB_DB_URL) {
 }
 
 mongoose.Promise = global.Promise;
-mongoose.connect(url);
+var connect = function () {
+    mongoose.connect(url);
+};
+connect();
 
 var db = mongoose.connection;
 
