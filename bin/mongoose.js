@@ -12,15 +12,15 @@ require('../models/Summary');
 require('../models/Performance');
 require('../models/FAQ');
 
-var url = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+var url = 'mongodb://'+process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
   process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
   process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
   process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
   process.env.OPENSHIFT_APP_NAME;
 
 // if (process.env.OPENSHIFT_MONGODB_DB_URL) {
-//     url = process.env.OPENSHIFT_MONGODB_DB_URL +
-//     process.env.OPENSHIFT_APP_NAME;
+    // url = process.env.OPENSHIFT_MONGODB_DB_URL +
+    // process.env.OPENSHIFT_APP_NAME;
 // }
 
 mongoose.Promise = global.Promise;
